@@ -7,7 +7,7 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 
 - [Installation](#installation)
 - [Demo](#demo)
-- [Build](#build-esmini)
+- [Build Esmini](#build-esmini)
 - [License](#license)
 
 
