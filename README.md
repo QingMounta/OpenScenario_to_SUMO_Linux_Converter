@@ -33,6 +33,8 @@ To install the package, just unzip it anywhere. A single subfolder named esmini-
 # Demo
 
 [(Back to top)](#table-of-contents)
+
+
 Try to run one of the examples:  
 
 go to folder esmini-demo/run/esmini  
@@ -46,6 +48,8 @@ You can also run the examples explicitly from a command line:
 
 
 # Build esmini - quick guide
+[(Back to top)](#table-of-contents)
+
 
 Make sure you have a C++ compiler and CMake installed.  
 
@@ -69,6 +73,7 @@ After a successful build, the binaries will be copied into esmini-(version)/bin 
 # License
 
 [(Back to top)](#table-of-contents)
+
 
 [Esmini](https://github.com/esmini/esmini.git)
 [Detailed User guide](https://esmini.github.io)
