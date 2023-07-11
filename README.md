@@ -8,6 +8,7 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 - [Installation](#installation)
 - [Demo](#demo)
 - [Build Esmini](#build-esmini)
+- [Converge to csv](#converge-to-csv)
 - [License](#license)
 
 
@@ -69,6 +70,37 @@ After a successful build, the binaries will be copied into esmini-(version)/bin 
 ```sh
 ./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc
 ```
+
+# Converge to csv
+[(Back to top)](#table-of-contents)
+
+1. Simple Scenario recording   
+
+Esmini can save a file that captures the state of all entities. This file can later be used either to replay (see Replay scenario) the scenario or converted for further analysis, e.g. in Excel..dat.csv  
+
+To create a recording with regular timesteps:  
+```sh
+./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc --fixed_timestep 0.05 --record sim.dat
+```
+To convert the .dat file into .csv, do either of:  
+```sh
+or./bin/dat2csv sim.dat
+python ./scripts/dat2csv.py sim.dat
+```
+Only a subset of the .dat file information is extracted. To extract some more info, e.g. road coordinates, run: ./scripts/dat2csv --extended sim.dat  
+
+2. CSV logger  
+To create a more complete csv logfile, compared to the content of the .dat file, activate the CSV_Logger:
+```sh
+./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc --fixed_timestep 0.05 --csv_logger full_log.csv
+```
+full_log.csv will contain more detailed states for all scenario entities. To also include collision detection:
+```sh
+./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc --fixed_timestep 0.05 --csv_logger full_log.csv --collision
+```
+All collisions (overlap) between entity bounding boxes will be registered in the column of each entity. It will contain the IDs of any entities overlapping at given frame.collision_ids
+
+
 
 # License
 
