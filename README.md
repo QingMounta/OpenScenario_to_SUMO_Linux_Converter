@@ -89,7 +89,8 @@ python ./scripts/dat2csv.py sim.dat
 ```
 Only a subset of the .dat file information is extracted. To extract some more info, e.g. road coordinates, run: ./scripts/dat2csv --extended sim.dat  
 
-2. CSV logger  
+2. CSV logger
+
 To create a more complete csv logfile, compared to the content of the .dat file, activate the CSV_Logger:
 ```sh
 ./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc --fixed_timestep 0.05 --csv_logger full_log.csv
