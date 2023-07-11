@@ -47,7 +47,7 @@ You can also run the examples explicitly from a command line:
 ```
 
 
-# Build esmini
+# Build Esmini
 [(Back to top)](#table-of-contents)
 
 
