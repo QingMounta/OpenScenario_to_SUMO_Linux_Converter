@@ -7,7 +7,7 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 
 - [Installation](#installation)
 - [Demo](#demo)
-- [Build](#build)
+- [Build](#build-esmini)
 - [License](#license)
 
 
@@ -47,7 +47,7 @@ You can also run the examples explicitly from a command line:
 ```
 
 
-# Build esmini - quick guide
+# Build esmini
 [(Back to top)](#table-of-contents)
 
 
