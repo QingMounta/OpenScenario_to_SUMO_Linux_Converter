@@ -17,10 +17,14 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 
 
 1. Download latest release from [here](https://github.com/esmini/esmini/releases/latest)
-2. Pick the demo package for your platform (Windows, Linux or Mac). 
-On Windows, make sure the zip file is not blocked: Right click, click Properties, at bottom right check Unblock. For more info, see Blocked by Windows Defender SmartScreen.
-To install the package, just unzip it anywhere. A single subfolder named esmini-demo is created. 
-3. Pick the package: esmini-(version) for your platform (Windows, Linux or Mac). 
+
+
+2. Pick the demo package for Windows. 
+Make sure the zip file is not blocked: Right click, click Properties, at bottom right check Unblock. For more info, see Blocked by Windows Defender SmartScreen.
+To install the package, just unzip it anywhere. A single subfolder named esmini-demo is created.
+
+
+4. Pick the package: esmini-(version) for your platform (Windows, Linux or Mac). 
 On Windows, make sure the zip file is not blocked: Right click, click Properties, at bottom right check Unblock. For more info, see Blocked by Windows Defender SmartScreen.
 To install the package, just unzip it anywhere. A single subfolder named esmini-(version) is created. This is the root folder for esmini. No files are stored outside this folder structure and no system files or registry is modified in any way.
 
@@ -29,7 +33,16 @@ To install the package, just unzip it anywhere. A single subfolder named esmini-
 # Demo
 
 [(Back to top)](#table-of-contents)
+Try to run one of the examples:
 
+go to folder esmini-demo/run/esmini
+
+double click on a .bat file, e.g. run_cut-in.bat or run it from a command line.
+
+You can also run the examples explicitly from a command line:
+```sh
+./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc
+```
 
 
 # Build esmini - quick guide
