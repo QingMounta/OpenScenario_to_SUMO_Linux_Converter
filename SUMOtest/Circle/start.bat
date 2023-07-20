@@ -1,0 +1,1 @@
+python randomTrips.py -n circle.net.xml -e 1；duarouter --trip-files trips.trips.xml --net-file circle.net.xml --output-file result.rou.xml;python xml2csv.py result.rou.xml;python TraciFile.py

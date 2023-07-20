@@ -1,0 +1,40 @@
+<routes>
+	<vType accel="1.5" decel="500.0" id="Car" length="4" maxSpeed="30" sigma="0.0" guiShape="passenger" />
+	<vType accel="1.0" decel="50.0" id="Bus" length="12.0" maxSpeed="20" sigma="0.0" guiShape="bus" />
+	<vType accel="1.0" decel="5.0" id="EgoBike" length="4" maxSpeed="999999999999999999" sigma="0.0" guiShape="passenger/sedan" />
+	<vType accel="1.0" decel="5.0" id="Obstacle" length="15" maxSpeed="999999999999999999" sigma="0.0" guiShape="bus" />
+	
+	
+	<!-- <route id="Bikeroute" edges="-3#3 -3#4 -7#0"/>  -->
+	<!-- <vehicle depart="0" id="Ego_vehicle" route="Bikeroute" type="EgoBike" /> -->
+
+	<!-- <route id="Obstacle1" edges="c43"/> -->
+	<!-- <vehicle depart="0" id="obstacle1" route="Obstacle1" type="Obstacle" /> -->
+	<!-- <route id="Obstacle2" edges="d23"/> -->
+	<!-- <vehicle depart="0" id="obstacle2" route="Obstacle2" type="Obstacle" /> -->
+	
+	<!-- <route id="Carroute01" edges="b1c1 c12 c2a2 a23 a3c3 c3d2 d23 d3c4 c43 c32 c21 c1b1"/> -->
+	<!-- <route id="Carroute02" edges="e12 e2d2 d23 d3c4 c43 c3a3 a32 a2c2 c23 c3d2 d2e2 e21"/> -->
+	<!-- <route id="Carroute03" edges="e12 e2d2 d23 d3c4 c43 c3a3 a32 a2c2 c23 c34 c4d3 d32 d2e2 e21"/> -->
+	
+	<!-- <route id="CarrouteCir1" edges="a2c2 c23 c34 c4d3 d32 d2c3 c3a3 a32"/> -->
+	<!-- <route id="CarrouteCir2" edges="a2c2 c23 c3d2 d23 d3c4 c43 c32 c2a2 a23 a34 a4b2 b2c4 c43 c32"/> -->
+	
+	<!-- <route id="CarrouteOuterCircle1" edges="a21 a1b1 b1c1 c1d1 d1e1 e12 e23 e3d4 d43 d3c4 c4b2 b2a4 a43 a32"/> -->
+	<!-- <route id="CarrouteOuterCircle2" edges="a12 a23 a34 a4b2 b2c4 c4d3 d34 d4e3 e32 e21 e1d1 d1c1 c1b1 b1a1"/> -->
+	
+	<!-- <route id="A3C3rlg_circ" edges="a12 a23 a3c3 c32 c2a2 a23 a3c3 c34 c4b2 b2a4 a43 a3c3 c3d2 d2e2 e21 e1d1 d1c1 c1b1 b1a1"/> -->
+	
+	
+
+	
+	
+	<!-- <flow id="f1" begin="0" end="10000" vehsPerHour="250" type="Car" route="CarrouteCir1"></flow> -->
+	
+	<!-- <flow id="f2" begin="0" end="10000" vehsPerHour="200" type="Car" route="CarrouteOuterCircle1"></flow> -->
+	<!-- <flow id="f3" begin="0" end="10000" vehsPerHour="200" type="Car" route="CarrouteOuterCircle2"></flow> -->
+	
+	<!-- <flow id="f4" begin="0" end="10000" vehsPerHour="150" type="Car" route="A3C3rlg_circ"></flow> -->
+	
+	
+</routes>

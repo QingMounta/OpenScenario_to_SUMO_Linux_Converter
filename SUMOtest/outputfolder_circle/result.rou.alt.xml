@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-07-19 17:54:30 by Eclipse SUMO duarouter Version 1.13.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="outputfolder_circle\circle.net.xml"/>
+        <route-files value="outputfolder_circle\trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="outputfolder_circle\result.rou.xml"/>
+        <alternatives-output value="outputfolder_circle\result.rou.alt.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vehicle id="0" depart="0.00">
+        <routeDistribution last="0">
+            <route cost="32.64" probability="1.00000000" edges="3 6 0 -0 -6 -3 -4 -2"/>
+        </routeDistribution>
+    </vehicle>
+</routes>

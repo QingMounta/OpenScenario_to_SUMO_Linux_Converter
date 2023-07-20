@@ -1,0 +1,54 @@
+esmini GIT REV: N/A
+esmini GIT TAG: N/A
+esmini GIT BRANCH: N/A
+esmini BUILD VERSION: N/A - client build
+Run simulation decoupled from realtime, with fixed timestep: 0.03
+Generated seed 2439914122
+Loading ..\resources\myresources\Circle/./circle.xosc (v1.0)
+0 variables
+Unsupported object type: -1 - interpret as NONE
+Loaded OpenDRIVE: ..\resources\myresources\Circle/././circle.xodr
+0 parameters
+0.000: Log all vehicle data in csv file
+0.000: Loaded scenegraph: ..\resources\myresources\Circle/./circle.osgb
+0.000: Failed to load road object model file: OriginReference.osgb (OriginReference). Creating a bounding box as stand in.
+0.000: Init Sedan RoutingAction standbyState -> startTransition -> runningState
+0.000: Init Sedan LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Starting teleport Action
+0.000: Sedan2 New position:
+0.000: Pos(-5.31, -83.91, 0.00) Rot(1.53, 0.00, 0.00) roadId 0 laneId -1 offset 0.00 t -1.75
+0.000: Init Sedan2 TeleportAction standbyState -> startTransition -> runningState
+0.000: Init Sedan2 LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Starting teleport Action
+0.000: Sedan3 New position:
+0.000: Pos(105.00, 1.59, 0.00) Rot(-3.12, 0.00, 0.00) roadId 9 laneId 1 offset 0.00 t 1.75
+0.000: Init Sedan3 TeleportAction standbyState -> startTransition -> runningState
+0.000: Init Sedan3 LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Starting teleport Action
+0.000: Sedan4 New position:
+0.000: Pos(-75.98, -10.08, 0.00) Rot(1.89, 0.00, 0.00) roadId 8 laneId 1 offset 0.00 t 1.75
+0.000: Init Sedan4 TeleportAction standbyState -> startTransition -> runningState
+0.000: Init Sedan4 LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Init Sedan LongitudinalAction runningState -> endTransition -> completeState
+0.000: Init Sedan2 TeleportAction runningState -> endTransition -> completeState
+0.000: Init Sedan2 LongitudinalAction runningState -> endTransition -> completeState
+0.000: Init Sedan3 TeleportAction runningState -> endTransition -> completeState
+0.000: Init Sedan3 LongitudinalAction runningState -> endTransition -> completeState
+0.000: Init Sedan4 TeleportAction runningState -> endTransition -> completeState
+0.000: Init Sedan4 LongitudinalAction runningState -> endTransition -> completeState
+0.025: Trigger /------------------------------------------------
+0.025: SimulationStart == true, 0.0250 > 0.00 edge: none
+0.025: Trigger  ------------------------------------------------/
+0.025: EmptyGroup standbyState -> startTransition -> runningState
+0.025: EmptyAct standbyState -> startTransition -> runningState
+0.025: EmptyGroup complete after 1 execution
+0.050: EmptyGroup runningState -> endTransition -> completeState
+22.325: Init Sedan RoutingAction runningState -> endTransition -> completeState
+22.550: Collision between Sedan and Sedan2
+22.550: Trigger /------------------------------------------------
+22.550: no name SimulationTimeCondition == false, 22.5500 > 60.00 edge: none
+22.550: collision 0 between Sedan and Sedan2
+22.550: no name CollisionCondition == true edge: none
+22.550: Triggering entity 0: Sedan
+22.550: Trigger  ------------------------------------------------/
+Closing
