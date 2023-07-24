@@ -15,6 +15,7 @@ import pandas as pd
 import math
 import sys
 import openpyxl
+import numpy as np
 
 
 class SocketServerSimple:
@@ -222,9 +223,9 @@ class Vehicle:
         self.id = id
         self.length = length
         self.half_length = length / 2
-        self.x_front = None
-        self.y_front = None
-        self.t_front = None
+        self.x_front = 0
+        self.y_front = 0
+        self.t_front = 0
         self.route = []
 
 def is_position_inside(x, y, polygon,print_flag):
@@ -236,7 +237,7 @@ def is_position_inside(x, y, polygon,print_flag):
         x2, y2 = polygon[(i + 1)]
 
         if y2!=y1:
-            margin = abs(0.3/(y2 - y1))
+            margin = abs(1/(y2 - y1))
         else:
             margin = 0
 
@@ -261,7 +262,7 @@ def angle_inlane(x, y, polygon):
         x1, y1 = polygon[i]
         x2, y2 = polygon[(i + 1)]
         if y2!=y1:
-            margin = abs(0.3/(y2 - y1))
+            margin = abs(1/(y2 - y1))
         else:
             margin = 0
         if ((y1 <= y < y2) or (y2 <= y < y1)) and ((x2 - x1) * (y - y1) / (y2 - y1) + x1 - margin < x < (x2 - x1) * (y - y1) / (y2 - y1) + x1+margin):
@@ -459,8 +460,8 @@ if __name__ == '__main__':
 
 
     step = 0
-    while step < trajectories.shape[0]:
-    # while step < 10:
+    while step < trajectories.shape[0]-2:
+    # while step < 1:
         traci.simulationStep()
         
         time.sleep(dt)
@@ -479,27 +480,54 @@ if __name__ == '__main__':
 
 
 
-                lane_ids = traci.lane.getIDList()
-                for lane_id in lane_ids:
-                    lane_shape = traci.lane.getShape(lane_id)
-                    # Check if the position (x, y) is within the lane's shape
-                    if is_position_inside(x_mid, y_mid, lane_shape):
+                # lane_ids = traci.lane.getIDList()
+                # for lane_id in lane_ids:
+                #     lane_shape = traci.lane.getShape(lane_id)
+                #     # Check if the position (x, y) is within the lane's shape
+                #     if is_position_inside(x_mid, y_mid, lane_shape,False):
 
-                        angle_lane_radian = angle_inlane(x_mid, y_mid, lane_shape)
-                        angle_lane_degrees = math.degrees(angle_lane_radian)
+                #         angle_lane_radian = angle_inlane(x_mid, y_mid, lane_shape)
+                #         angle_lane_degrees = math.degrees(angle_lane_radian)
+                        
 
                 
-                vehicles[Vehicle_ID].x_front = x_mid+math.sin(angle_lane_radian)*half_vehicle_length
-                vehicles[Vehicle_ID].y_front = y_mid+math.cos(angle_lane_radian)*half_vehicle_length
-                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_lane_degrees,2)
+                # vehicles[Vehicle_ID].x_front = x_mid+math.sin(angle_lane_radian)*half_vehicle_length
+                # vehicles[Vehicle_ID].y_front = y_mid+math.cos(angle_lane_radian)*half_vehicle_length
+                print("\n")
+                print("init position of ",Vehicle_ID,": ", x_mid,y_mid)
+                traci.vehicle.moveToXY(Vehicle_ID," ", 1 ,x_mid,y_mid,-1000000,2)
 
+            traci.simulationStep()
+            time.sleep(dt)
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+                lane_id_init = traci.vehicle.getLaneID(Vehicle_ID)
+                print("lane id at beginning: ",lane_id_init," with the shape: ",traci.lane.getShape(lane_id_init))
+                # angle = traci.vehicle.getAngle(Vehicle_ID)
+                # print(angle)
+            traci.simulationStep()
+            time.sleep(dt)
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+                angle_init_degree = traci.vehicle.getAngle(Vehicle_ID)
+                print("angle: ",angle_init_degree)
+                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+
+                vehicles[Vehicle_ID].x_front = x_mid+math.sin(np.deg2rad(angle_init_degree))*half_vehicle_length
+                vehicles[Vehicle_ID].y_front = y_mid+math.cos(np.deg2rad(angle_init_degree))*half_vehicle_length
+
+                traci.vehicle.moveToXY(Vehicle_ID," ", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_init_degree,2)
+                print("head position of ",Vehicle_ID," at: ", vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front)
                 # Record the time vehicles need to reach their front
                 vehicles[Vehicle_ID].t_front = time_reachFront(trajectories.loc[:][' #' + str(iter) + ' World_Position_X [m] '],trajectories.loc[:][' #' + str(iter) + ' World_Position_Y [m] '],half_vehicle_length)
+                print("the steps needed to move from middle to front is ",vehicles[Vehicle_ID].t_front)
 
         else:
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
                 
+                # print(Vehicle_ID,vehicles[Vehicle_ID].t_front)
                 if step+vehicles[Vehicle_ID].t_front < trajectories.shape[0]:
                     x_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_X [m/s] ']
                     y_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_Y [m/s] ']

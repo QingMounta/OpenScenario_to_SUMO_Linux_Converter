@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generated on 2023-07-24 18:50:30.801344 by randomTrips.py v1_13_0+0000-4b5bca80615
+<configuration>
+    <end value="1"/>
+    <net-file value="outputfolder_ALKS_CutoutFullyBocking\ALKS_CutoutFullyBocking.net.xml"/>
+</configuration>
+
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+</routes>

@@ -337,6 +337,8 @@ if __name__ == '__main__':
     
 
     # from full_log.csv
+    # static_trajectories = pd.read_csv("outputfolder_"+filename+"/sim.csv",sep=",",header=1)
+
     trajectories = pd.read_csv("outputfolder_"+filename+"/full_log.csv",sep=",",header=6)
     Vehicle_Num=int((trajectories.shape[1] - 3) / 31)
 
@@ -361,7 +363,7 @@ if __name__ == '__main__':
                 offset_data = line.strip().split('"')[1].split(',')   
     offset_x = float(offset_data[0]) #FourWaySignalL: 117,21; Circle: 233.85
     offset_y = float(offset_data[1]) #FourWaySignalL: 80.39; Circle: 109.72
-
+    print(offset_x,offset_y)
     
 
     # start sumo
@@ -372,20 +374,27 @@ if __name__ == '__main__':
     step = 0
     
 
-    ## initialization of vehicles using random route
-    # random route reader
-    pd_reader = pd.read_csv("outputfolder_"+filename+"/result.rou.csv",sep=";")
-    randomRoute = pd_reader.loc[0]['route_edges'].split(" ")
-    # initialization
-    traci.route.add("InitialRoute", randomRoute)
-    for iter in range(1,Vehicle_Num+1):
-        Vehicle_ID =  "vehicle" + str(iter) 
-        traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
+    # ## initialization of vehicles using random route
+    # # random route reader
+    # pd_reader = pd.read_csv("outputfolder_"+filename+"/result.rou.csv",sep=";")
+    # randomRoute = pd_reader.loc[0]['route_edges'].split(" ")
+    # # initialization
+    # traci.route.add("InitialRoute", randomRoute)
+    # for iter in range(1,Vehicle_Num+1):
+    #     Vehicle_ID =  "vehicle" + str(iter) 
+    #     traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
 
 
     # Creating a dictionary to store Vehicle objects with their IDs as keys
     vehicles = {}
 
+
+    lane_ids = traci.lane.getIDList()
+            
+    for lane_id in lane_ids:
+        
+        lane_shape = traci.lane.getShape(lane_id)
+        print(lane_id,lane_shape)
     
     while step < trajectories.shape[0]:
         for iter in range(1,Vehicle_Num+1):
@@ -398,10 +407,12 @@ if __name__ == '__main__':
             x_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
             y_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
             lane_ids = traci.lane.getIDList()
+            
             for lane_id in lane_ids:
+                
                 lane_shape = traci.lane.getShape(lane_id)
                 # Check if the position (x, y) is within the lane's shape
-                if is_position_inside(x_mid, y_mid, lane_shape,False):
+                if is_position_inside(x_mid, y_mid, lane_shape,True):
                     
                     edge_id = find_edge_from_lane(net, lane_id)
                     if vehicles[Vehicle_ID].route != []:
@@ -420,7 +431,7 @@ if __name__ == '__main__':
     with open(txt_filename, 'w') as file:
         file.write('')
     # route_df = pd.DataFrame()
-    for iter in range(1,5):
+    for iter in range(1,2):
         Vehicle_ID =  "vehicle" + str(iter)
         
         # Write the list to the text file
@@ -434,11 +445,15 @@ if __name__ == '__main__':
 
 
 
-        traci.vehicle.setRoute(Vehicle_ID, vehicles[Vehicle_ID].route)
-        x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-        y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-        traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_mid,y_mid,-10000000,2)
-        # traci.vehicle.moveTo(Vehicle_ID, vehicles[Vehicle_ID].route[0], pos=50)
+        # # traci.vehicle.setRoute(Vehicle_ID, vehicles[Vehicle_ID].route)
+
+        # traci.route.add("InitialRoute1", vehicles[Vehicle_ID].route)
+        # traci.vehicle.add(Vehicle_ID, "InitialRoute1", typeID="Car")
+        # x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+        # y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+        # traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_mid,y_mid,-10000000,2)
+
+        # # traci.vehicle.moveTo(Vehicle_ID, vehicles[Vehicle_ID].route[0], pos=50)
 
 
 
