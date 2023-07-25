@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-07-25 10:55:46 by Eclipse SUMO duarouter Version 1.13.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="outputfolder_ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE\ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE.net.xml"/>
+        <route-files value="outputfolder_ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE\trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="outputfolder_ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE\result.rou.xml"/>
+        <alternatives-output value="outputfolder_ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE\result.rou.alt.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vehicle id="0" depart="0.00">
+        <route edges="0 -0"/>
+    </vehicle>
+</routes>

@@ -520,6 +520,7 @@ if __name__ == '__main__':
                 traci.vehicle.moveToXY(Vehicle_ID," ", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_init_degree,2)
                 print("head position of ",Vehicle_ID," at: ", vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front)
                 # Record the time vehicles need to reach their front
+
                 vehicles[Vehicle_ID].t_front = time_reachFront(trajectories.loc[:][' #' + str(iter) + ' World_Position_X [m] '],trajectories.loc[:][' #' + str(iter) + ' World_Position_Y [m] '],half_vehicle_length)
                 print("the steps needed to move from middle to front is ",vehicles[Vehicle_ID].t_front)
 
@@ -528,20 +529,29 @@ if __name__ == '__main__':
                 Vehicle_ID =  "vehicle" + str(iter) 
                 
                 # print(Vehicle_ID,vehicles[Vehicle_ID].t_front)
-                if step+vehicles[Vehicle_ID].t_front < trajectories.shape[0]:
-                    x_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_X [m/s] ']
-                    y_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_Y [m/s] ']
-                else:
-                    x_vel = 0
-                    y_vel = 0
+                # if step+vehicles[Vehicle_ID].t_front < trajectories.shape[0]:
+                #     x_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_X [m/s] ']
+                #     y_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_Y [m/s] ']
+                # else:
+                #     x_vel = 0
+                #     y_vel = 0
                     
-                
+
+
+                x_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+                x_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_X [m/s] ']
+                y_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_Y [m/s] ']
+
                 angle_vehicle_radian = math.atan2(x_vel, y_vel)
                 angle_vehicle_degrees = math.degrees(angle_vehicle_radian)
 
-                
-                vehicles[Vehicle_ID].x_front = vehicles[Vehicle_ID].x_front + x_vel * dt
-                vehicles[Vehicle_ID].y_front = vehicles[Vehicle_ID].y_front + y_vel * dt
+                # vehicles[Vehicle_ID].x_front = vehicles[Vehicle_ID].x_front + x_vel * dt
+                # vehicles[Vehicle_ID].y_front = vehicles[Vehicle_ID].y_front + y_vel * dt
+
+                half_vehicle_length = vehicles[Vehicle_ID].length/2
+                vehicles[Vehicle_ID].x_front = x_mid + half_vehicle_length*math.sin(angle_vehicle_radian)
+                vehicles[Vehicle_ID].y_front = y_mid + half_vehicle_length*math.cos(angle_vehicle_radian)
                 
                 traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_vehicle_degrees,2)
 
