@@ -6,6 +6,6 @@
     <time> 
         <begin value="0"/> 
         <end value="10000"/> 
-        <step-length value="0.025"/> 
+        <step-length value="0.001"/> 
     </time> 
 </configuration> 
