@@ -219,10 +219,12 @@ def StartSumoGUI():
 
 
 class Vehicle:
-    def __init__(self, id, length):
+    def __init__(self, id, length, bb_center):
         self.id = id
         self.length = length
+        self.bb_center = bb_center
         self.half_length = length / 2
+        self.bb_center_ref2frontmid = [self.half_length+bb_center[0],bb_center[1]]
         self.x_front = 0
         self.y_front = 0
         self.t_front = 0
@@ -352,7 +354,7 @@ if __name__ == '__main__':
 
 
     ## sampling time
-    dt = 0.025
+    dt = 0.001
 
     #Get offset
     net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
@@ -388,74 +390,130 @@ if __name__ == '__main__':
     vehicles = {}
 
     
-    # while step < trajectories.shape[0]:
-    #     for iter in range(1,Vehicle_Num+1):
-    #         Vehicle_ID =  "vehicle" + str(iter)
+   
 
-    #         if step == 0:
-    #             vehicle_length  = trajectories.loc[0][' #' + str(iter) + ' bb_length [m] ']
-    #             vehicles[Vehicle_ID] = Vehicle(Vehicle_ID, vehicle_length)
 
-    #         x_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-    #         y_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-    #         lane_ids = traci.lane.getIDList()
-    #         for lane_id in lane_ids:
-    #             lane_shape = traci.lane.getShape(lane_id)
-    #             # Check if the position (x, y) is within the lane's shape
-    #             if is_position_inside(x_mid, y_mid, lane_shape,False):
+
+    step = 0
+    while step < trajectories.shape[0]-2:
+    # while step < 1:
+        traci.simulationStep()
+        
+        time.sleep(dt)
+        if step == 0:
+        # if True:
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+                vehicle_length  = trajectories.loc[0][' #' + str(iter) + ' bb_length [m] ']
+                bounding_box_center = [trajectories.loc[0][' #' + str(iter) + ' bb_x [m] '],trajectories.loc[0][' #' + str(iter) + ' bb_y [m] ']]
+                
+                vehicles[Vehicle_ID] = Vehicle(Vehicle_ID, vehicle_length,bounding_box_center)
+
+                print("bb_center reference 2 front mid of ",Vehicle_ID,": ", vehicles[Vehicle_ID].bb_center_ref2frontmid)
+                
+
+                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+
+
+                # print("\n")
+                # print("init position of ",Vehicle_ID,": ", x_mid,y_mid)
+                traci.vehicle.moveToXY(Vehicle_ID," ", 1 ,x_mid,y_mid,-1000000,2)
+
+            traci.simulationStep()
+            time.sleep(dt)
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+                lane_id_init = traci.vehicle.getLaneID(Vehicle_ID)
+                # print("lane id at beginning: ",lane_id_init," with the shape: ",traci.lane.getShape(lane_id_init))
+
+            traci.simulationStep()
+            time.sleep(dt)
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+
+                
+
+
+                angle_init_degree = traci.vehicle.getAngle(Vehicle_ID)
+                print("angle: ",angle_init_degree)
+                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+
+                vehicles[Vehicle_ID].x_front = x_mid+math.sin(np.deg2rad(angle_init_degree))*vehicles[Vehicle_ID].bb_center_ref2frontmid[0]
+                vehicles[Vehicle_ID].y_front = y_mid+math.cos(np.deg2rad(angle_init_degree))*vehicles[Vehicle_ID].bb_center_ref2frontmid[0]
+
+                traci.vehicle.moveToXY(Vehicle_ID," ", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_init_degree,2)
+                # print("head position of ",Vehicle_ID," at: ", vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front)
+                # Record the time vehicles need to reach their front
+
+                vehicles[Vehicle_ID].t_front = time_reachFront(trajectories.loc[:][' #' + str(iter) + ' World_Position_X [m] '],trajectories.loc[:][' #' + str(iter) + ' World_Position_Y [m] '],vehicles[Vehicle_ID].bb_center_ref2frontmid[0])
+                print("the steps needed to move from middle to front is ",vehicles[Vehicle_ID].t_front)
+
+        else:
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+
                     
-    #                 edge_id = find_edge_from_lane(net, lane_id)
-    #                 if vehicles[Vehicle_ID].route != []:
-    #                     if edge_id != vehicles[Vehicle_ID].route[-1] and edge_id != "":
-    #                         vehicles[Vehicle_ID].route.append(edge_id)
-    #                 else:
-    #                     vehicles[Vehicle_ID].route.append(edge_id)
-    #                 # vehicles[Vehicle_ID].route.append(lane_id)
 
-                    
+
+                x_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+                x_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_X [m/s] ']
+                y_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_Y [m/s] ']
+
+                angle_vehicle_radian = math.atan2(x_vel, y_vel)
+                angle_vehicle_degrees = math.degrees(angle_vehicle_radian)
+
+
+                half_vehicle_length = vehicles[Vehicle_ID].length/2
+                vehicles[Vehicle_ID].x_front = x_mid + vehicles[Vehicle_ID].bb_center_ref2frontmid[0]*math.sin(angle_vehicle_radian)
+                vehicles[Vehicle_ID].y_front = y_mid + vehicles[Vehicle_ID].bb_center_ref2frontmid[0]*math.cos(angle_vehicle_radian)
+                
+                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_vehicle_degrees,2)
+
 
         
-    #     step += 1
+        step += 1
 
-    # txt_filename = "route_list.txt"
-    # with open(txt_filename, 'w') as file:
-    #     file.write('')
-    # # route_df = pd.DataFrame()
-    # for iter in range(1,5):
-    #     Vehicle_ID =  "vehicle" + str(iter)
+
+
         
-    #     # Write the list to the text file
-    #     with open(txt_filename, "a") as file:
-    #         file.write(Vehicle_ID + ": ")
-    #         for item in vehicles[Vehicle_ID].route:
-    #             file.write(item)
-    #         file.write("\n")
-    #         file.write("\n")
-    #     print(vehicles[Vehicle_ID].route)
+    traci.close()
 
 
 
-    #     traci.vehicle.setRoute(Vehicle_ID, vehicles[Vehicle_ID].route)
-    #     x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-    #     y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-    #     traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_mid,y_mid,-10000000,2)
-    #     # traci.vehicle.moveTo(Vehicle_ID, vehicles[Vehicle_ID].route[0], pos=50)
 
 
 
+
+    ## sampling time
+    dt = 0.001
+
+    # start sumo
+    traci.start(["sumo-gui","-c", "outputfolder_"+filename+"/simulation.sumocfg","--num-clients", "1"])
+    # traci.start(["sumo","-c", "outputfolder_"+filename+"/simulation.sumocfg","--num-clients", "1"])
+    
+    traci.setOrder(0)
+    step = 0
     
 
-    # for _ in range(50000):
-    #         traci.simulationStep()
+    ## initialization of vehicles using random route
+    # random route reader
+    pd_reader = pd.read_csv("outputfolder_"+filename+"/result.rou.csv",sep=";")
+    randomRoute = pd_reader.loc[0]['route_edges'].split(" ")
+    # initialization
+    traci.route.add("InitialRoute", randomRoute)
+    for iter in range(1,Vehicle_Num+1):
+        Vehicle_ID =  "vehicle" + str(iter) 
+        traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
 
 
+    # Creating a dictionary to store Vehicle objects with their IDs as keys
+    vehicles = {}
 
-
-
-
-
-
-
+    
+   
 
 
 
