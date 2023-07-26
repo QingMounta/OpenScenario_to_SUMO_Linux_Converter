@@ -559,4 +559,4 @@ if __name__ == '__main__':
     
 
         
-    traci.close()
+    # traci.close()
