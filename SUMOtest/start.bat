@@ -48,7 +48,7 @@ if !errorlevel! equ 0 (
     echo     ^<time^> >> "outputfolder_%filename%\simulation.sumocfg"
     echo         ^<begin value="0"/^> >> "outputfolder_%filename%\simulation.sumocfg"
     echo         ^<end value="10000"/^> >> "outputfolder_%filename%\simulation.sumocfg"
-    @REM echo         ^<step-length value="0.025"/^> >> "outputfolder_%filename%\simulation.sumocfg"
+    echo         ^<step-length value="0.025"/^> >> "outputfolder_%filename%\simulation.sumocfg"
     echo     ^</time^> >> "outputfolder_%filename%\simulation.sumocfg"
     echo ^</configuration^> >> "outputfolder_%filename%\simulation.sumocfg"
 
