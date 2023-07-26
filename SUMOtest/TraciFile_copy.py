@@ -230,6 +230,8 @@ class Vehicle:
         self.t_front = 0
         self.route = []
         self.vehicle_pos_xosc_index = 0
+        self.change2sumo = False
+        self.changed = False
 
 
 
@@ -358,7 +360,7 @@ if __name__ == '__main__':
         Vehicle_ID =  "vehicle" + str(iter) 
         traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
         
-
+    traci.vehicle.add("Ego", "InitialRoute", typeID="Car")
 
     # Creating a dictionary to store Vehicle objects with their IDs as keys
     vehicles = {}
@@ -489,8 +491,25 @@ if __name__ == '__main__':
     logging4sumo.to_excel(excel_file, index=False)
 
 
+
+
+
+
+
+
     ## sampling time
     dt = 0.025
+
+
+    server = SocketServerSimple("127.0.0.1",25001,dt)
+    server.messageToSend = "default"
+
+    thread1 = threading.Thread(target=server.start)
+
+    thread1.start()
+
+
+
     
 
     # start sumo
@@ -505,32 +524,111 @@ if __name__ == '__main__':
         Route_ID = "InitialRoute" + str(iter)
         traci.route.add(Route_ID, vehicles[Vehicle_ID].route)
         traci.vehicle.add(Vehicle_ID, Route_ID, typeID="Car")
+    traci.vehicle.add("Ego", "InitialRoute1", typeID="Car")
     
     net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
     # while step < trajectories.shape[0]-1:
-    while True:
+    for _ in range(int(20/dt)):
+        traci.simulationStep()
+        time.sleep(dt)
+    while step < 30/dt:
         traci.simulationStep()
         
         time.sleep(dt)
         
-        if step == 0:
-            for iter in range(1,5):
-                Vehicle_ID =  "vehicle" + str(iter) 
+        # if step == 0:
+        #     for iter in range(1,Vehicle_Num+1):
+        #         Vehicle_ID =  "vehicle" + str(iter) 
 
+        #         x_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_X[m]']
+        #         y_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_Y[m]']
+        #         angle_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Rotation_Z[m]']
+        #         print("sumo:",x_sumo,y_sumo)
+        #         x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+        #         y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+        #         print("mid:",x_mid,y_mid)
+
+        #         traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)
+        # elif step==40:
+        #      for iter in range(1,Vehicle_Num+1):
+        #         Vehicle_ID =  "vehicle" + str(iter) 
+        #         vehicle_pos = traci.vehicle.getPosition(Vehicle_ID)
+        #         print(vehicle_pos)
+        #         threshold = 1
+        #         vehicle_pos_xosc_index = getNearestPos(iter-1,Vehicle_Num,logging4sumo,vehicle_pos,threshold)
+        #         vehicles[Vehicle_ID].vehicle_pos_xosc_index = vehicle_pos_xosc_index
+        #         print(Vehicle_ID,"now at xosc pos with index ",vehicle_pos_xosc_index)
+        #         if vehicle_pos_xosc_index != float('inf'):
+        #             x_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_X[m]']
+        #             y_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_Y[m]']
+        #             angle_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Rotation_Z[m]']
+        #             traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)
+        # elif step>40:
+        #      for iter in range(1,Vehicle_Num+1):
+        #         Vehicle_ID =  "vehicle" + str(iter) 
+        #         vehicles[Vehicle_ID].vehicle_pos_xosc_index += Vehicle_Num
+        #         # logging4sumo_this_ID = logging4sumo[logging4sumo["EntityID"] == iter-1]
+        #         # print(logging4sumo_this_ID)
+        #         if vehicles[Vehicle_ID].vehicle_pos_xosc_index < logging4sumo.shape[0]:
+        #             x_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_X[m]']
+        #             y_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_Y[m]']
+        #             angle_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Rotation_Z[m]']
+        #             print(Vehicle_ID,x_sumo,y_sumo,angle_sumo)
+
+
+        #             traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)        
+        #         else:
+        #             vehicle_pos_final = traci.vehicle.getPosition(Vehicle_ID)
+        #             angle_final_degree = traci.vehicle.getAngle(Vehicle_ID)
+        #             traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicle_pos_final[0],vehicle_pos_final[1],angle_final_degree,2)
+        
+
+        # ==============================
+        # Send Values from Unity to SUMO
+        # ==============================
+        # Ego Vehicle
+        try:
+            msg = json.loads(server.messageReceived)
+            traci.vehicle.moveToXY("Ego","", 1 ,msg["positionX"],msg["positionY"],msg["rotation"],2)
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+                pos_surrounding_veh = traci.vehicle.getPosition(Vehicle_ID)
+                distance = math.sqrt((pos_surrounding_veh[0] - msg["positionX"]) ** 2 + (pos_surrounding_veh[1] - msg["positionY"]) ** 2)
+                if distance < 5:
+                    vehicles[Vehicle_ID].change2sumo = True
+                else:
+                    vehicles[Vehicle_ID].change2sumo = False
+            #traci.vehicle.setSpeed(msg["id"],msg["speed"])
+
+            
+        except:
+            pass
+
+        for iter in range(1,Vehicle_Num+1):
+            Vehicle_ID =  "vehicle" + str(iter) 
+            print(Vehicle_ID,"now change2sumo: ",vehicles[Vehicle_ID].change2sumo,"now changed: ",vehicles[Vehicle_ID].changed)
+            if Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False and vehicles[Vehicle_ID].changed == False:
                 x_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_X[m]']
                 y_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_Y[m]']
                 angle_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Rotation_Z[m]']
-                print("sumo:",x_sumo,y_sumo)
-                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-                print("mid:",x_mid,y_mid)
+                # print("sumo:",x_sumo,y_sumo)
+                # x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                # y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+                # print("mid:",x_mid,y_mid)
 
-                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)
-        elif step==40:
-             for iter in range(1,Vehicle_Num+1):
-                Vehicle_ID =  "vehicle" + str(iter) 
+                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)  
+            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == True and vehicles[Vehicle_ID].changed == False:
+                vehicles[Vehicle_ID].changed = True
+                vehicle_pos_now = traci.vehicle.getPosition(Vehicle_ID)
+                # angle_final_degree = traci.vehicle.getAngle(Vehicle_ID)
+                # traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicle_pos_final[0],vehicle_pos_final[1],angle_final_degree,2)
+                lane = net.getNeighboringLanes(vehicle_pos_now[0], vehicle_pos_now[1], includeJunctions=False)[0][0]
+                pos_lane = lane.getClosestLanePosAndDist((vehicle_pos_now[0], vehicle_pos_now[1]))[0]
+
+                traci.vehicle.moveTo(Vehicle_ID, lane.getID(), pos_lane)  # not working on internal lanes
+            
+            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False and vehicles[Vehicle_ID].changed == True and vehicles[Vehicle_ID].vehicle_pos_xosc_index == 0:
                 vehicle_pos = traci.vehicle.getPosition(Vehicle_ID)
-                print(vehicle_pos)
                 threshold = 1
                 vehicle_pos_xosc_index = getNearestPos(iter-1,Vehicle_Num,logging4sumo,vehicle_pos,threshold)
                 vehicles[Vehicle_ID].vehicle_pos_xosc_index = vehicle_pos_xosc_index
@@ -540,23 +638,64 @@ if __name__ == '__main__':
                     y_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_Y[m]']
                     angle_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Rotation_Z[m]']
                     traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)
-        elif step>40:
-             for iter in range(1,Vehicle_Num+1):
-                Vehicle_ID =  "vehicle" + str(iter) 
+
+            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False and vehicles[Vehicle_ID].changed == True and vehicles[Vehicle_ID].vehicle_pos_xosc_index != 0:
                 vehicles[Vehicle_ID].vehicle_pos_xosc_index += Vehicle_Num
                 # logging4sumo_this_ID = logging4sumo[logging4sumo["EntityID"] == iter-1]
                 # print(logging4sumo_this_ID)
-                x_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_X[m]']
-                y_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_Y[m]']
-                angle_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Rotation_Z[m]']
-                print(Vehicle_ID,x_sumo,y_sumo,angle_sumo)
+                if vehicles[Vehicle_ID].vehicle_pos_xosc_index < logging4sumo.shape[0]:
+                    x_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_X[m]']
+                    y_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_Y[m]']
+                    angle_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Rotation_Z[m]']
+                    print(Vehicle_ID,x_sumo,y_sumo,angle_sumo)
 
 
-                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)        
+                    traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)        
+                
+
+            elif Vehicle_Num*step+iter-1 >= logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False:
+                vehicle_pos_final = traci.vehicle.getPosition(Vehicle_ID)
+                angle_final_degree = traci.vehicle.getAngle(Vehicle_ID)
+                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicle_pos_final[0],vehicle_pos_final[1],angle_final_degree,2)
+        
+
+
+        # ==============================
+        # Send Values from SUMO to Unity
+        # ==============================
+        idList = traci.vehicle.getIDList()
+        simulationTime = traci.simulation.getTime()
+
+        vehicleList = list()
+        for i in range(0,len(idList)):
+            id = idList[i]
+            pos = traci.vehicle.getPosition(id)
+            rot = traci.vehicle.getAngle(id)
+            speed = traci.vehicle.getSpeed(id)
+            signals = traci.vehicle.getSignals(id)
+            vehType = traci.vehicle.getVehicleClass(id)
+            #edge = traci.vehicle.getRoadID(id)
+            #length = traci.vehicle.getLength(id)
+            #width = traci.vehicle.getWidth(id)
+
+            #print(veh.ToString())
+            veh = SumoVehicle(id,pos,rot,speed,signals,vehType)
+            vehicleList.append(veh.__dict__)
+
+
+        sumoSimStep = SumoSimulationStepInfo(simulationTime,vehicleList,0).__dict__
+        server.messageToSend = json.dumps(sumoSimStep)
+
+        
         
         step += 1
 
     
 
         
-    # traci.close()
+    traci.close()
+
+
+
+
+
