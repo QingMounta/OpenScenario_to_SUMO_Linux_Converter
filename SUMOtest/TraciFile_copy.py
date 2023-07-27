@@ -359,6 +359,7 @@ if __name__ == '__main__':
     for iter in range(1,Vehicle_Num+1):
         Vehicle_ID =  "vehicle" + str(iter) 
         traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
+        traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
         
     traci.vehicle.add("Ego", "InitialRoute", typeID="Car")
 
@@ -400,10 +401,16 @@ if __name__ == '__main__':
             # time.sleep(dt)
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
+
+                # add edge id in route
                 lane_id_init = traci.vehicle.getLaneID(Vehicle_ID)
                 edge_id_init = find_edge_from_lane(net, lane_id_init)
                 vehicles[Vehicle_ID].route.append(edge_id_init)
-                # print("lane id at beginning: ",lane_id_init," with the shape: ",traci.lane.getShape(lane_id_init))
+
+                # # add lane ID in route
+                # lane_id_init = traci.vehicle.getLaneID(Vehicle_ID)
+                # vehicles[Vehicle_ID].route.append(lane_id_init)
+
 
             traci.simulationStep()
             # time.sleep(dt)
@@ -441,11 +448,17 @@ if __name__ == '__main__':
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
 
-                    
+                # add edge id in route    
                 lane_id_now= traci.vehicle.getLaneID(Vehicle_ID)
                 edge_id_now = find_edge_from_lane(net, lane_id_now)
                 if edge_id_now != vehicles[Vehicle_ID].route[-1] and edge_id_now != "":
                     vehicles[Vehicle_ID].route.append(edge_id_now)
+
+                # # add lane id in route    
+                # lane_id_now= traci.vehicle.getLaneID(Vehicle_ID)
+                # if lane_id_now != vehicles[Vehicle_ID].route[-1] and lane_id_now != "":
+                #     vehicles[Vehicle_ID].route.append(lane_id_now)
+                
                 
 
 
@@ -518,17 +531,20 @@ if __name__ == '__main__':
     
     traci.setOrder(0)
     step = 0
+    allChange2SUMO = False
+    changed = False
 
     for iter in range(1,Vehicle_Num+1):
         Vehicle_ID =  "vehicle" + str(iter)
         Route_ID = "InitialRoute" + str(iter)
         traci.route.add(Route_ID, vehicles[Vehicle_ID].route)
         traci.vehicle.add(Vehicle_ID, Route_ID, typeID="Car")
+        traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
     traci.vehicle.add("Ego", "InitialRoute1", typeID="Car")
     
     net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
     # while step < trajectories.shape[0]-1:
-    for _ in range(int(20/dt)):
+    for _ in range(int(10/dt)):
         traci.simulationStep()
         time.sleep(dt)
     while step < 30/dt:
@@ -588,37 +604,40 @@ if __name__ == '__main__':
         # ==============================
         # Ego Vehicle
         try:
+
             msg = json.loads(server.messageReceived)
             traci.vehicle.moveToXY("Ego","", 1 ,msg["positionX"],msg["positionY"],msg["rotation"],2)
+            distance = []
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
                 pos_surrounding_veh = traci.vehicle.getPosition(Vehicle_ID)
-                distance = math.sqrt((pos_surrounding_veh[0] - msg["positionX"]) ** 2 + (pos_surrounding_veh[1] - msg["positionY"]) ** 2)
-                if distance < 5:
-                    vehicles[Vehicle_ID].change2sumo = True
-                else:
-                    vehicles[Vehicle_ID].change2sumo = False
+                distance.append(math.sqrt((pos_surrounding_veh[0] - msg["positionX"]) ** 2 + (pos_surrounding_veh[1] - msg["positionY"]) ** 2))
+
+            if all(item >= 5 for item in distance):
+                allChange2SUMO = False
+            else:
+                allChange2SUMO = True
             #traci.vehicle.setSpeed(msg["id"],msg["speed"])
 
             
         except:
             pass
 
+        print("now change2sumo: ",allChange2SUMO,"now changed: ",changed)
         for iter in range(1,Vehicle_Num+1):
             Vehicle_ID =  "vehicle" + str(iter) 
-            print(Vehicle_ID,"now change2sumo: ",vehicles[Vehicle_ID].change2sumo,"now changed: ",vehicles[Vehicle_ID].changed)
-            if Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False and vehicles[Vehicle_ID].changed == False:
+            # print(Vehicle_ID,"now change2sumo: ",vehicles[Vehicle_ID].change2sumo,"now changed: ",vehicles[Vehicle_ID].changed)
+            # if Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False and vehicles[Vehicle_ID].changed == False:
+            if Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and allChange2SUMO == False and changed == False:
                 x_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_X[m]']
                 y_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_Y[m]']
                 angle_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Rotation_Z[m]']
-                # print("sumo:",x_sumo,y_sumo)
-                # x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-                # y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-                # print("mid:",x_mid,y_mid)
+
 
                 traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)  
-            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == True and vehicles[Vehicle_ID].changed == False:
-                vehicles[Vehicle_ID].changed = True
+            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and allChange2SUMO == True and changed == False:
+                # vehicles[Vehicle_ID].changed = True
+                changed = True
                 vehicle_pos_now = traci.vehicle.getPosition(Vehicle_ID)
                 # angle_final_degree = traci.vehicle.getAngle(Vehicle_ID)
                 # traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicle_pos_final[0],vehicle_pos_final[1],angle_final_degree,2)
@@ -627,7 +646,7 @@ if __name__ == '__main__':
 
                 traci.vehicle.moveTo(Vehicle_ID, lane.getID(), pos_lane)  # not working on internal lanes
             
-            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False and vehicles[Vehicle_ID].changed == True and vehicles[Vehicle_ID].vehicle_pos_xosc_index == 0:
+            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and allChange2SUMO == False and changed == True and vehicles[Vehicle_ID].vehicle_pos_xosc_index == 0:
                 vehicle_pos = traci.vehicle.getPosition(Vehicle_ID)
                 threshold = 1
                 vehicle_pos_xosc_index = getNearestPos(iter-1,Vehicle_Num,logging4sumo,vehicle_pos,threshold)
@@ -639,10 +658,9 @@ if __name__ == '__main__':
                     angle_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Rotation_Z[m]']
                     traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)
 
-            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False and vehicles[Vehicle_ID].changed == True and vehicles[Vehicle_ID].vehicle_pos_xosc_index != 0:
+            elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and allChange2SUMO == False and changed == True and vehicles[Vehicle_ID].vehicle_pos_xosc_index != 0:
                 vehicles[Vehicle_ID].vehicle_pos_xosc_index += Vehicle_Num
-                # logging4sumo_this_ID = logging4sumo[logging4sumo["EntityID"] == iter-1]
-                # print(logging4sumo_this_ID)
+
                 if vehicles[Vehicle_ID].vehicle_pos_xosc_index < logging4sumo.shape[0]:
                     x_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_X[m]']
                     y_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_Y[m]']
@@ -653,7 +671,7 @@ if __name__ == '__main__':
                     traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)        
                 
 
-            elif Vehicle_Num*step+iter-1 >= logging4sumo.shape[0] and vehicles[Vehicle_ID].change2sumo == False:
+            elif Vehicle_Num*step+iter-1 >= logging4sumo.shape[0] and allChange2SUMO == False:
                 vehicle_pos_final = traci.vehicle.getPosition(Vehicle_ID)
                 angle_final_degree = traci.vehicle.getAngle(Vehicle_ID)
                 traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicle_pos_final[0],vehicle_pos_final[1],angle_final_degree,2)
