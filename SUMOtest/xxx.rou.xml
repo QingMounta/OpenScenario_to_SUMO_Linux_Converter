@@ -1,0 +1,4 @@
+<routes>
+    <vType accel="10" decel="10" id="Ego" length="5.0" maxSpeed="70" sigma="0.0" guiShape="passenger" />
+    <vType id="TargetBlocking" length="0.3"  sigma="0.0"/>
+</routes>

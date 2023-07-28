@@ -27,9 +27,9 @@ REM Prompt the user to enter the xodr filename (e.g., circle)
 set /p odrfilename=Enter the xodr filename (e.g., circle): 
 
 REM Run esmini command
-..\bin\esmini --window 60 60 800 400 --osc ..\%filepath%\%filename%.xosc --fixed_timestep 0.025 --record sim.dat
-..\bin\dat2csv sim.dat
-..\bin\esmini --window 60 60 800 400 --osc ..\%filepath%\%filename%.xosc --fixed_timestep 0.025 --csv_logger full_log.csv --collision
+@REM ..\bin\esmini --window 60 60 800 400 --osc ..\%filepath%\%filename%.xosc --fixed_timestep 0.025 --record sim.dat
+@REM ..\bin\dat2csv sim.dat
+..\bin\esmini --osc ..\%filepath%\%filename%.xosc --fixed_timestep 0.025 --csv_logger full_log.csv --collision
 
 REM Create the output folder using the user-defined filename
 mkdir "outputfolder_%filename%"
@@ -64,7 +64,7 @@ if !errorlevel! equ 0 (
     move "outputfolder_%filename%\vehicleType.rou.xml" "outputfolder_%filename%\%filename%.rou.xml"
     move "full_log.csv" "outputfolder_%filename%\"
     move "sim.csv" "outputfolder_%filename%\"
-    python TraciFile_copy.py "%filename%"
+    python TraciFile.py "%filename%"
 ) else (
     REM Display an error message
     echo Failed to convert the file.

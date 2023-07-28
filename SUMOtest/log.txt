@@ -3,43 +3,23 @@ esmini GIT TAG: N/A
 esmini GIT BRANCH: N/A
 esmini BUILD VERSION: N/A - client build
 Run simulation decoupled from realtime, with fixed timestep: 0.03
-Generated seed 1421666396
-Loading ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE.xosc (v1.1)
+Generated seed 165755567
+Loading ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./ALKS_Scenario_4.2_4_MultipleBlockingTargets_TEMPLATE.xosc (v1.1)
 0 variables
 Loaded OpenDRIVE: ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/././ALKS_Road_straight.xodr
 Missing esminiController property, using controller name: ALKSController
 Expr ${$Ego_InitSpeed_Ve0_kph / 3.6} = 60.0 / 3.6 = 16.6666666667
-No orientation type specified - using absolute
-No orientation type specified - using absolute
-Expr ${-$TargetBlocking_InitPosition_LateralOffset_m} = --5.0 = 5.0000000000
-No orientation type specified - using absolute
-Expr ${2 * sqrt( $TargetBlocking_InitPosition_LateralOffset_m * $TargetBlocking_InitPosition_LateralOffset_m ) / ($TargetBlocking_Speed_kph / 3.6)} = 2 * sqrt( -5.0 * -5.0 ) / (5.0 / 3.6) = 7.2000000000
-Expr ${sqrt( $TargetBlocking_InitPosition_LateralOffset_m * $TargetBlocking_InitPosition_LateralOffset_m ) / ($TargetBlocking_Speed_kph / 3.6)} = sqrt( -5.0 * -5.0 ) / (5.0 / 3.6) = 3.6000000000
+Expr ${$TargetBlocking_InitPosition_LongitudinalOffset_m + 15.0} = 500.0 + 15.0 = 515.0000000000
 Expr ${($TargetBlocking_InitPosition_LongitudinalOffset_m / ($Ego_InitSpeed_Ve0_kph / 3.6)) + 10.0} = (500.0 / (60.0 / 3.6)) + 10.0 = 40.0000000000
 7 parameters:
-   TargetBlocking_Speed_kph = 5.0
-   TargetBlocking_InitPosition_LateralOffset_m = -5.0
    TargetBlocking_InitPosition_LongitudinalOffset_m = 500.0
-   TargetBlocking_InitPosition_Heading_rad = 1.57
+   TargetBlocking2_Model = bus
+   TargetBlocking_Model = pedestrian
+   TargetBlocking_Catalog = PedestrianCatalog
    Ego_InitSpeed_Ve0_kph = 60.0
    Ego_InitPosition_LaneId = -4
    Road = ./ALKS_Road_straight.xodr
 0.000: Log all vehicle data in csv file
-0.000: No scenegraph 3D model loaded. Generating a simplistic one...
-0.000: Failed to load visual model Adult. Also tried the following paths:
-0.000:     ..\bin/./Adult
-0.000:     ..\bin/../models/Adult
-0.000:     ..\bin/.//../resources/models/Adult
-0.000:     ..\bin/./Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/../models/Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/.//../resources/models/Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./././Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/././../models/Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./././/../resources/models/Adult
-0.000:     ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./././Adult
-0.000: Creating a dummy model instead
 0.000: Starting teleport Action
 0.000: Ego New position:
 0.000: Pos(5.00, -8.00, 0.00) Rot(0.00, 0.00, 0.00) roadId 0 laneId -4 offset 0.00 t -8.00
@@ -47,41 +27,28 @@ Expr ${($TargetBlocking_InitPosition_LongitudinalOffset_m / ($Ego_InitSpeed_Ve0_
 0.000: Init Ego LongitudinalAction standbyState -> startTransition -> runningState
 0.000: Starting teleport Action
 0.000: TargetBlocking New position:
-0.000: Pos(500.00, -13.00, 0.00) Rot(1.57, 0.00, 0.00) roadId 0 laneId -4 offset -5.00 t -13.00
+0.000: Pos(500.00, -8.00, 0.00) Rot(0.00, 0.00, 0.00) roadId 0 laneId -4 offset 0.00 t -8.00
 0.000: Init TargetBlocking TeleportAction standbyState -> startTransition -> runningState
+0.000: Starting teleport Action
+0.000: TargetBlocking2 New position:
+0.000: Pos(515.00, -8.00, 0.00) Rot(0.00, 0.00, 0.00) roadId 0 laneId -4 offset 0.00 t -8.00
+0.000: Init TargetBlocking2 TeleportAction standbyState -> startTransition -> runningState
 0.000: Init Ego TeleportAction runningState -> endTransition -> completeState
 0.000: Init Ego LongitudinalAction runningState -> endTransition -> completeState
 0.000: Init TargetBlocking TeleportAction runningState -> endTransition -> completeState
+0.000: Init TargetBlocking2 TeleportAction runningState -> endTransition -> completeState
 0.000: Trigger /------------------------------------------------
 0.000: ActivateALKSControllerActCondition == true, 0.0000 >= 0.00 edge: none
 0.000: Trigger  ------------------------------------------------/
 0.000: ActivateALKSControllerManeuver standbyState -> startTransition -> runningState
 0.000: ActivateALKSControllerManeuverGroup standbyState -> startTransition -> runningState
 0.000: ActivateALKSControllerAct standbyState -> startTransition -> runningState
-0.000: Trigger /------------------------------------------------
-0.000: CrossActStart == true, 0.0000 >= 0.00 edge: none
-0.000: Trigger  ------------------------------------------------/
-0.000: CrossManeuver standbyState -> startTransition -> runningState
-0.000: CrossManeuverGroup standbyState -> startTransition -> runningState
-0.000: CrossAct standbyState -> startTransition -> runningState
 3.000: Trigger /------------------------------------------------
 3.000: ActivateALKSControllerEventCondition == true, 3.0000 >= 3.00 edge: none
 3.000: Trigger  ------------------------------------------------/
 3.000: Controller ALKSController activated, domain mask=0x3
 3.025: ActivateALKSControllerAction standbyState -> startTransition -> runningState
 3.025: ActivateALKSControllerEvent standbyState -> startTransition -> runningState
-25.875: Trigger /------------------------------------------------
-25.875: CrossStartCondition == true, HWT: 3.58 < 3.60, edge rising
-25.875: Triggering entity 0: Ego
-25.875: Trigger  ------------------------------------------------/
-25.900: CrossAction standbyState -> startTransition -> runningState
-25.900: CrossEvent standbyState -> startTransition -> runningState
-33.050: CrossEvent complete after 1 execution
-33.075: CrossAction runningState -> endTransition -> completeState
-33.075: CrossEvent runningState -> endTransition -> completeState
-33.075: CrossManeuverGroup complete after 1 execution
-33.100: CrossManeuver runningState -> endTransition -> completeState
-33.100: CrossManeuverGroup runningState -> endTransition -> completeState
 40.000: Trigger /------------------------------------------------
 40.000: End == true, 40.0000 >= 40.00 edge: rising
 40.000: Trigger  ------------------------------------------------/

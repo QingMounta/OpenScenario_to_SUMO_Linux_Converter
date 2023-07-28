@@ -1,0 +1,11 @@
+<configuration> 
+    <input> 
+        <net-file value="ALKS_Scenario_4.2_4_MultipleBlockingTargets_TEMPLATE.net.xml"/> 
+        <route-files value="ALKS_Scenario_4.2_4_MultipleBlockingTargets_TEMPLATE.rou.xml"/> 
+    </input> 
+    <time> 
+        <begin value="0"/> 
+        <end value="10000"/> 
+        <step-length value="0.025"/> 
+    </time> 
+</configuration> 

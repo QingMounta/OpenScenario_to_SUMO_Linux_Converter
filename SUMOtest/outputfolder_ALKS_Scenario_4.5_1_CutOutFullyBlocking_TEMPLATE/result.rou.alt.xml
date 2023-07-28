@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-07-28 15:53:56 by Eclipse SUMO duarouter Version 1.13.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="outputfolder_ALKS_Scenario_4.5_1_CutOutFullyBlocking_TEMPLATE\ALKS_Scenario_4.5_1_CutOutFullyBlocking_TEMPLATE.net.xml"/>
+        <route-files value="outputfolder_ALKS_Scenario_4.5_1_CutOutFullyBlocking_TEMPLATE\trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="outputfolder_ALKS_Scenario_4.5_1_CutOutFullyBlocking_TEMPLATE\result.rou.xml"/>
+        <alternatives-output value="outputfolder_ALKS_Scenario_4.5_1_CutOutFullyBlocking_TEMPLATE\result.rou.alt.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vehicle id="0" depart="0.00">
+        <routeDistribution last="0">
+            <route cost="1442.29" probability="1.00000000" edges="0 -0"/>
+        </routeDistribution>
+    </vehicle>
+</routes>

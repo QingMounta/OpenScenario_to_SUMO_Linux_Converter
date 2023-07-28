@@ -15,6 +15,7 @@ import pandas as pd
 import math
 import sys
 import openpyxl
+import numpy as np
 
 
 class SocketServerSimple:
@@ -218,70 +219,21 @@ def StartSumoGUI():
 
 
 class Vehicle:
-    def __init__(self, id, length):
+    def __init__(self, id, length, bb_center):
         self.id = id
         self.length = length
+        self.bb_center = bb_center
         self.half_length = length / 2
-        self.x_front = None
-        self.y_front = None
-        self.t_front = None
+        self.bb_center_ref2frontmid = [self.half_length+bb_center[0],bb_center[1]]
+        self.x_front = 0
+        self.y_front = 0
+        self.t_front = 0
         self.route = []
+        self.vehicle_pos_xosc_index = 0
+        self.change2sumo = False
+        self.changed = False
 
-def is_position_inside(x, y, polygon,print_flag):
-    crossings = False
-    n = len(polygon)
 
-    for i in range(n-1):
-        x1, y1 = polygon[i]
-        x2, y2 = polygon[(i + 1)]
-
-        if y2!=y1:
-            margin = abs(0.3/(y2 - y1))
-        else:
-            margin = 0
-
-        if ((y1 <= y < y2) or (y2 <= y < y1)) and ((x2 - x1) * (y - y1) / (y2 - y1) + x1 - margin < x < (x2 - x1) * (y - y1) / (y2 - y1) + x1 + margin):
-            crossings = True
-            if print_flag == True:
-                print("\n")
-                print((x2 - x1) * (y - y1) / (y2 - y1) + x1 - margin,x,(x2 - x1) * (y - y1) / (y2 - y1) + x1 + margin)
-                print("\n")
-                print(x1,x,x2)
-                print("\n")
-                print(y1,y,y2)
-                
-
-    return crossings
-
-def angle_inlane(x, y, polygon):
-    crossings = 0
-    n = len(polygon)
-
-    for i in range(n-1):
-        x1, y1 = polygon[i]
-        x2, y2 = polygon[(i + 1)]
-        if y2!=y1:
-            margin = abs(0.3/(y2 - y1))
-        else:
-            margin = 0
-        if ((y1 <= y < y2) or (y2 <= y < y1)) and ((x2 - x1) * (y - y1) / (y2 - y1) + x1 - margin < x < (x2 - x1) * (y - y1) / (y2 - y1) + x1+margin):
-            angle = math.atan2(x2 - x1, y2 - y1)
-            angle_degrees = math.degrees(angle)
-    return angle
-
-def time_reachFront(x_pos_list,y_pos_list,half_vehicle_length):
-    
-    x0 = x_pos_list[0]
-    y0 = y_pos_list[0]
-    i = 0
-
-    dist_from_begin = 0
-    while dist_from_begin < half_vehicle_length:
-        i += 1
-        dist_from_begin = math.sqrt((x_pos_list[i] - x0)**2 + (y_pos_list[i] - y0)**2)
-  
-    time_front = i
-    return time_front
 
 def find_edge_from_lane(net, lane_id):
     try:
@@ -292,6 +244,29 @@ def find_edge_from_lane(net, lane_id):
         # Handle the case when lane ID does not exist in the network
         return ""
 
+def getNearestPos(ID,Vehicle_Num,logging4sumo,vehicle_pos,threshold):
+    target_veh = ID
+    logging4sumo_this_ID = logging4sumo[logging4sumo["EntityID"] == target_veh]
+    min_distance = float('inf')
+    min_x, min_y = None, None
+    min_index = None
+
+    for index, row in logging4sumo_this_ID.iterrows():
+        x, y = row['World_Position_X[m]'], row['World_Position_Y[m]']
+        
+        # Calculate Euclidean distance between (x, y) and (x_test, y_test)
+        distance = math.sqrt((x - vehicle_pos[0]) ** 2 + (y - vehicle_pos[1]) ** 2)
+        
+        # Update minimum distance and corresponding coordinates and index if applicable
+        if distance < min_distance:
+            min_distance = distance
+            min_x, min_y = x, y
+            min_index = index
+    # Check if the minimum distance is less than the threshold and return the result
+    if min_distance < threshold:
+        return min_index
+    else:
+        return float('inf')
 
 # ---=========---
 #      MAIN
@@ -337,8 +312,6 @@ if __name__ == '__main__':
     
 
     # from full_log.csv
-    # static_trajectories = pd.read_csv("outputfolder_"+filename+"/sim.csv",sep=",",header=1)
-
     trajectories = pd.read_csv("outputfolder_"+filename+"/full_log.csv",sep=",",header=6)
     Vehicle_Num=int((trajectories.shape[1] - 3) / 31)
 
@@ -350,7 +323,7 @@ if __name__ == '__main__':
     
     
 
-
+    
 
     ## sampling time
     dt = 0.025
@@ -363,7 +336,7 @@ if __name__ == '__main__':
                 offset_data = line.strip().split('"')[1].split(',')   
     offset_x = float(offset_data[0]) #FourWaySignalL: 117,21; Circle: 233.85
     offset_y = float(offset_data[1]) #FourWaySignalL: 80.39; Circle: 109.72
-    print(offset_x,offset_y)
+
     
 
     # start sumo
@@ -372,179 +345,267 @@ if __name__ == '__main__':
     
     traci.setOrder(0)
     step = 0
-    
 
-    # ## initialization of vehicles using random route
-    # # random route reader
-    # pd_reader = pd.read_csv("outputfolder_"+filename+"/result.rou.csv",sep=";")
-    # randomRoute = pd_reader.loc[0]['route_edges'].split(" ")
-    # # initialization
-    # traci.route.add("InitialRoute", randomRoute)
-    # for iter in range(1,Vehicle_Num+1):
-    #     Vehicle_ID =  "vehicle" + str(iter) 
-    #     traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
 
+
+    ## initialization of vehicles using random route
+    # random route reader
+    pd_reader = pd.read_csv("outputfolder_"+filename+"/result.rou.csv",sep=";")
+    randomRoute = pd_reader.loc[0]['route_edges'].split(" ")
+    # initialization
+    traci.route.add("InitialRoute", randomRoute)
+
+    print(randomRoute)
+    for iter in range(1,Vehicle_Num+1):
+        Vehicle_ID =  "vehicle" + str(iter) 
+        traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
+        traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
+        
+    traci.vehicle.add("Ego", "InitialRoute", typeID="Car")
 
     # Creating a dictionary to store Vehicle objects with their IDs as keys
     vehicles = {}
 
 
-    lane_ids = traci.lane.getIDList()
-            
-    for lane_id in lane_ids:
-        
-        lane_shape = traci.lane.getShape(lane_id)
-        print(lane_id,lane_shape)
+    # # Create an empty DataFrame with desired columns
+    logging4sumo_data = []
+
     
-    while step < trajectories.shape[0]:
-        for iter in range(1,Vehicle_Num+1):
-            Vehicle_ID =  "vehicle" + str(iter)
 
-            if step == 0:
-                vehicle_length  = trajectories.loc[0][' #' + str(iter) + ' bb_length [m] ']
-                vehicles[Vehicle_ID] = Vehicle(Vehicle_ID, vehicle_length)
-
-            x_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-            y_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-            lane_ids = traci.lane.getIDList()
-            
-            for lane_id in lane_ids:
-                
-                lane_shape = traci.lane.getShape(lane_id)
-                # Check if the position (x, y) is within the lane's shape
-                if is_position_inside(x_mid, y_mid, lane_shape,True):
-                    
-                    edge_id = find_edge_from_lane(net, lane_id)
-                    if vehicles[Vehicle_ID].route != []:
-                        if edge_id != vehicles[Vehicle_ID].route[-1] and edge_id != "":
-                            vehicles[Vehicle_ID].route.append(edge_id)
-                    else:
-                        vehicles[Vehicle_ID].route.append(edge_id)
-                    # vehicles[Vehicle_ID].route.append(lane_id)
-
-                    
-
+    while step < trajectories.shape[0]-1:
+    # while step < 1:
+        traci.simulationStep()
         
+        # time.sleep(dt)
+        if step == 0:
+        # if True:
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+                vehicle_length  = trajectories.loc[0][' #' + str(iter) + ' bb_length [m] ']
+                bounding_box_center = [trajectories.loc[0][' #' + str(iter) + ' bb_x [m] '],trajectories.loc[0][' #' + str(iter) + ' bb_y [m] ']]
+                
+                vehicles[Vehicle_ID] = Vehicle(Vehicle_ID, vehicle_length,bounding_box_center)
+
+                print("bb_center reference 2 front mid of ",Vehicle_ID,": ", vehicles[Vehicle_ID].bb_center_ref2frontmid)
+                
+
+                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+
+
+                # print("\n")
+                # print("init position of ",Vehicle_ID,": ", x_mid,y_mid)
+                traci.vehicle.moveToXY(Vehicle_ID," ", 1 ,x_mid,y_mid,-1000000,2)
+
+            traci.simulationStep()
+            # time.sleep(dt)
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+
+                # add edge id in route
+                lane_id_init = traci.vehicle.getLaneID(Vehicle_ID)
+                edge_id_init = find_edge_from_lane(net, lane_id_init)
+                vehicles[Vehicle_ID].route.append(edge_id_init)
+
+                # # add lane ID in route
+                # lane_id_init = traci.vehicle.getLaneID(Vehicle_ID)
+                # vehicles[Vehicle_ID].route.append(lane_id_init)
+
+
+            traci.simulationStep()
+            # time.sleep(dt)
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+
+                
+
+
+                angle_init_degree = traci.vehicle.getAngle(Vehicle_ID)
+                print("angle: ",angle_init_degree)
+                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+
+                vehicles[Vehicle_ID].x_front = x_mid+math.sin(np.deg2rad(angle_init_degree))*vehicles[Vehicle_ID].bb_center_ref2frontmid[0]
+                vehicles[Vehicle_ID].y_front = y_mid+math.cos(np.deg2rad(angle_init_degree))*vehicles[Vehicle_ID].bb_center_ref2frontmid[0]
+
+                traci.vehicle.moveToXY(Vehicle_ID," ", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_init_degree,2)
+                # print("head position of ",Vehicle_ID," at: ", vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front)
+                
+                # Record the time vehicles need to reach their front
+                # vehicles[Vehicle_ID].t_front = time_reachFront(trajectories.loc[:][' #' + str(iter) + ' World_Position_X [m] '],trajectories.loc[:][' #' + str(iter) + ' World_Position_Y [m] '],vehicles[Vehicle_ID].bb_center_ref2frontmid[0])
+                # print("the steps needed to move from middle to front is ",vehicles[Vehicle_ID].t_front)
+                logging4sumo_data.append({"timestamp":trajectories.loc[0][' TimeStamp [s] '],
+                                          "EntityName":trajectories.loc[0][' #' + str(iter) + ' Entitity_Name [-] '],
+                                          "EntityID":trajectories.loc[0][' #' + str(iter) + ' Entitity_ID [-] '],
+                                          "World_Position_X[m]":vehicles[Vehicle_ID].x_front,
+                                          "World_Position_Y[m]":vehicles[Vehicle_ID].y_front,
+                                          "World_Rotation_Z[m]":angle_init_degree})
+    
+                # Append the data to the DataFrame
+                # logging4sumo = logging4sumo.append(data, ignore_index=True)
+
+        else:
+            for iter in range(1,Vehicle_Num+1):
+                Vehicle_ID =  "vehicle" + str(iter) 
+
+                # add edge id in route    
+                lane_id_now= traci.vehicle.getLaneID(Vehicle_ID)
+                edge_id_now = find_edge_from_lane(net, lane_id_now)
+                if edge_id_now != vehicles[Vehicle_ID].route[-1] and edge_id_now != "":
+                    vehicles[Vehicle_ID].route.append(edge_id_now)
+
+                # # add lane id in route    
+                # lane_id_now= traci.vehicle.getLaneID(Vehicle_ID)
+                # if lane_id_now != vehicles[Vehicle_ID].route[-1] and lane_id_now != "":
+                #     vehicles[Vehicle_ID].route.append(lane_id_now)
+                
+                
+
+
+                x_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
+                y_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+                x_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_X [m/s] ']
+                y_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_Y [m/s] ']
+
+                angle_vehicle_radian = math.atan2(x_vel, y_vel)
+                angle_vehicle_degrees = math.degrees(angle_vehicle_radian)
+
+                if x_vel==0 and y_vel == 0:
+                    angle_vehicle_degrees = logging4sumo_data[Vehicle_Num*(step-1)+iter-1]['World_Rotation_Z[m]']
+                    angle_vehicle_radian = math.radians(angle_vehicle_degrees)
+                
+                vehicles[Vehicle_ID].x_front = x_mid + vehicles[Vehicle_ID].bb_center_ref2frontmid[0]*math.sin(angle_vehicle_radian)
+                vehicles[Vehicle_ID].y_front = y_mid + vehicles[Vehicle_ID].bb_center_ref2frontmid[0]*math.cos(angle_vehicle_radian)
+                if step == 1:
+                    print(x_mid,y_mid,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front)
+                
+                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_vehicle_degrees,2)
+
+                logging4sumo_data.append({"timestamp":trajectories.loc[step][' TimeStamp [s] '],
+                                          "EntityName":trajectories.loc[step][' #' + str(iter) + ' Entitity_Name [-] '],
+                                          "EntityID":trajectories.loc[step][' #' + str(iter) + ' Entitity_ID [-] '],
+                                          "World_Position_X[m]":vehicles[Vehicle_ID].x_front,
+                                          "World_Position_Y[m]":vehicles[Vehicle_ID].y_front,
+                                          "World_Rotation_Z[m]":angle_vehicle_degrees})
+    
+                # Append the data to the DataFrame
+                # logging4sumo = logging4sumo.append(data, ignore_index=True)
+
+
+        # time.sleep(dt)
         step += 1
 
-    txt_filename = "route_list.txt"
-    with open(txt_filename, 'w') as file:
-        file.write('')
-    # route_df = pd.DataFrame()
-    for iter in range(1,2):
-        Vehicle_ID =  "vehicle" + str(iter)
-        
-        # Write the list to the text file
-        with open(txt_filename, "a") as file:
-            file.write(Vehicle_ID + ": ")
-            for item in vehicles[Vehicle_ID].route:
-                file.write(item)
-            file.write("\n")
-            file.write("\n")
+    for iter in range(1,Vehicle_Num+1):
+        Vehicle_ID =  "vehicle" + str(iter) 
         print(vehicles[Vehicle_ID].route)
-
-
-
-        # # traci.vehicle.setRoute(Vehicle_ID, vehicles[Vehicle_ID].route)
-
-        # traci.route.add("InitialRoute1", vehicles[Vehicle_ID].route)
-        # traci.vehicle.add(Vehicle_ID, "InitialRoute1", typeID="Car")
-        # x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-        # y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-        # traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_mid,y_mid,-10000000,2)
-
-        # # traci.vehicle.moveTo(Vehicle_ID, vehicles[Vehicle_ID].route[0], pos=50)
-
-
-
-    
-
-    for _ in range(50000):
-            traci.simulationStep()
-
-
-
-
-
-
-
-
-
-
-
-
-    # step = 0
-    # while step < trajectories.shape[0]:
-    # # while step < 10:
-    #     traci.simulationStep()
-        
-    #     time.sleep(dt)
-    #     if step == 0:
-    #     # if True:
-    #         for iter in range(1,Vehicle_Num+1):
-    #             Vehicle_ID =  "vehicle" + str(iter) 
-    #             vehicle_length  = trajectories.loc[0][' #' + str(iter) + ' bb_length [m] ']
-    #             vehicles[Vehicle_ID] = Vehicle(Vehicle_ID, vehicle_length)
-
-    #             half_vehicle_length = vehicles[Vehicle_ID].length/2
-                
-
-    #             x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-    #             y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-
-
-
-    #             lane_ids = traci.lane.getIDList()
-    #             for lane_id in lane_ids:
-    #                 lane_shape = traci.lane.getShape(lane_id)
-    #                 # Check if the position (x, y) is within the lane's shape
-    #                 if is_position_inside(x_mid, y_mid, lane_shape):
-
-    #                     angle_lane_radian = angle_inlane(x_mid, y_mid, lane_shape)
-    #                     angle_lane_degrees = math.degrees(angle_lane_radian)
-
-                
-    #             vehicles[Vehicle_ID].x_front = x_mid+math.sin(angle_lane_radian)*half_vehicle_length
-    #             vehicles[Vehicle_ID].y_front = y_mid+math.cos(angle_lane_radian)*half_vehicle_length
-    #             traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_lane_degrees,2)
-
-    #             # Record the time vehicles need to reach their front
-    #             vehicles[Vehicle_ID].t_front = time_reachFront(trajectories.loc[:][' #' + str(iter) + ' World_Position_X [m] '],trajectories.loc[:][' #' + str(iter) + ' World_Position_Y [m] '],half_vehicle_length)
-
-    #     else:
-    #         for iter in range(1,Vehicle_Num+1):
-    #             Vehicle_ID =  "vehicle" + str(iter) 
-                
-    #             if step+vehicles[Vehicle_ID].t_front < trajectories.shape[0]:
-    #                 x_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_X [m/s] ']
-    #                 y_vel = trajectories.loc[step+vehicles[Vehicle_ID].t_front][' #' + str(iter) + ' Vel_Y [m/s] ']
-    #             else:
-    #                 x_vel = 0
-    #                 y_vel = 0
-                    
-                
-    #             angle_vehicle_radian = math.atan2(x_vel, y_vel)
-    #             angle_vehicle_degrees = math.degrees(angle_vehicle_radian)
-
-                
-    #             vehicles[Vehicle_ID].x_front = vehicles[Vehicle_ID].x_front + x_vel * dt
-    #             vehicles[Vehicle_ID].y_front = vehicles[Vehicle_ID].y_front + y_vel * dt
-                
-    #             traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_vehicle_degrees,2)
-
-
-        
-    #     step += 1
-
-
 
         
     traci.close()
 
+
+    logging4sumo = pd.DataFrame(logging4sumo_data)
+    excel_file = "outputfolder_"+filename+"/loggingData4SUMO.xlsx"
+    logging4sumo.to_excel(excel_file, index=False)
+
+
+
+
+
+
+
+
+    ## sampling time
+    dt = 0.025
+
+
+    server = SocketServerSimple("127.0.0.1",25001,dt)
+    server.messageToSend = "default"
+
+    thread1 = threading.Thread(target=server.start)
+
+    thread1.start()
+
+
+
     
 
+    # start sumo
+    traci.start(["sumo-gui","-c", "outputfolder_"+filename+"/simulation.sumocfg","--num-clients", "1"])
+    # traci.start(["sumo","-c", "outputfolder_"+filename+"/simulation.sumocfg","--num-clients", "1"])
+    
+    traci.setOrder(0)
+    step = 0
+    allChange2SUMO = False
+    changed = False
+
+    for iter in range(1,Vehicle_Num+1):
+        Vehicle_ID =  "vehicle" + str(iter)
+        Route_ID = "InitialRoute" + str(iter)
+        traci.route.add(Route_ID, vehicles[Vehicle_ID].route)
+        traci.vehicle.add(Vehicle_ID, Route_ID, typeID="Car")
+        traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
+    # traci.vehicle.add("Ego", "InitialRoute1", typeID="Car")
+    
+    net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
 
     
+    for _ in range(int(10/dt)):
+        traci.simulationStep()
+        time.sleep(dt)
+        for iter in range(1,Vehicle_Num+1):
+            Vehicle_ID =  "vehicle" + str(iter) 
+            x_sumo = logging4sumo.loc[iter-1]['World_Position_X[m]']
+            y_sumo = logging4sumo.loc[iter-1]['World_Position_Y[m]']
+            angle_sumo = logging4sumo.loc[iter-1]['World_Rotation_Z[m]']
+            traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2) 
 
 
-    
+
+    # while step < trajectories.shape[0]-1:
+    while step < 42/dt:
+        traci.simulationStep()
+        
+        time.sleep(dt)
+        for iter in range(1,Vehicle_Num+1):
+            Vehicle_ID =  "vehicle" + str(iter) 
+
+            if Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and allChange2SUMO == False and changed == False:
+                x_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_X[m]']
+                y_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_Y[m]']
+                angle_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Rotation_Z[m]']
+
+
+                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)  
+            elif Vehicle_Num*step+iter-1 >= logging4sumo.shape[0] and allChange2SUMO == False:
+                vehicle_pos_final = traci.vehicle.getPosition(Vehicle_ID)
+                angle_final_degree = traci.vehicle.getAngle(Vehicle_ID)
+                traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicle_pos_final[0],vehicle_pos_final[1],angle_final_degree,2)
+        
+
+        # ==============================
+        # Send Values from SUMO to Unity
+        # ==============================
+        idList = traci.vehicle.getIDList()
+        simulationTime = traci.simulation.getTime()
+
+        vehicleList = list()
+        for i in range(0,len(idList)):
+            id = idList[i]
+            pos = traci.vehicle.getPosition(id)
+            rot = traci.vehicle.getAngle(id)
+            speed = traci.vehicle.getSpeed(id)
+            signals = traci.vehicle.getSignals(id)
+            vehType = traci.vehicle.getVehicleClass(id)
+            #edge = traci.vehicle.getRoadID(id)
+            #length = traci.vehicle.getLength(id)
+            #width = traci.vehicle.getWidth(id)
+
+            #print(veh.ToString())
+            veh = SumoVehicle(id,pos,rot,speed,signals,vehType)
+            vehicleList.append(veh.__dict__)
+
+
+        sumoSimStep = SumoSimulationStepInfo(simulationTime,vehicleList,0).__dict__
+        server.messageToSend = json.dumps(sumoSimStep)
+        step += 1
+    traci.close()
