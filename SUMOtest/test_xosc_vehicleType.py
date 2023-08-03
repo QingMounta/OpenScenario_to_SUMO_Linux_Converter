@@ -6,14 +6,15 @@ import copy
 
 # Load the OpenSCENARIO file
 file_path = "../resources/myresources/OSC-ALKS-scenarios/Scenarios/ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE.xosc"
+# file_path = "../resources/myresources/SampleScenarios/575d7e80-10e8-4f39-84b3-ddb52fbf6089.xosc"
 # file_path = "../resources/myresources/Circle/circle.xosc"
 tree = ET.parse(file_path)
 root = tree.getroot()
 
 
 catalogs = tree.find("CatalogLocations")
-print(catalogs)
-print(list(catalogs))
+# print(catalogs)
+# print(list(catalogs))
 if list(catalogs) != []:
     # catalog_types = ["Vehicle",
     #                 "Controller",
@@ -86,7 +87,7 @@ if list(catalogs) != []:
 
 
                 
-                print("The catalog name ",catalog_name," with the item name of", entry.attrib.get("name"), "has the following infos", catalogs_dict[catalog_name][entry.attrib.get("name")])
+                print("The catalog name '",catalog_name,"' with the item name of '", entry.attrib.get("name"), "' has the following infos: ", catalogs_dict[catalog_name][entry.attrib.get("name")])
 
 catalogs = tree.find("CatalogLocations")    
 
@@ -105,7 +106,7 @@ if list(catalogs) != []:
                     
                     Info = catalogs_dict[catalog_name][entry_name]
                     Info["ID"] = ScenarioObject_name
-                    print("The ScenarioObject_name: ",ScenarioObject_name," from catalog name:",catalog_name," with entry name:",entry_name," has following infos:",Info)
+                    print("The ScenarioObject_name: '",ScenarioObject_name,"' from catalog name: '",catalog_name,"' with entry name: '",entry_name,"' has following infos:",Info)
                     if catalog_name == "VehicleCatalog":
                         xml_string[str(i)] = f'''    <vType accel="{Info["maxAcceleration"]}" decel="{Info["maxDeceleration"]}" id="{Info["ID"]}" length="{Info["length"]}" maxSpeed="{Info["maxSpeed"]}" sigma="0.0" guiShape="passenger" />'''
                     elif catalog_name == "PedestrianCatalog":
@@ -123,7 +124,7 @@ else:
             ScenarioObject_name = obj.attrib.get("name")
             
             Vehicle = obj.find("Vehicle")
-            print(Vehicle)
+            # print(Vehicle)
             Info = {}
             Info["ID"] = ScenarioObject_name
             Info["vehicleCategory"] = Vehicle.attrib.get("vehicleCategory")
@@ -135,7 +136,7 @@ else:
             BB_Dimension = BoundingBox.find("Dimensions")
             Info["length"] = BB_Dimension.attrib.get("length")
 
-            print("The ScenarioObject_name: ",ScenarioObject_name," directly has following infos:",Info)
+            print("The ScenarioObject_name: '",ScenarioObject_name,"' directly has following infos: ",Info)
 
             xml_string[str(i)] = f'''    <vType accel="{Info["maxAcceleration"]}" decel="{Info["maxDeceleration"]}" id="{Info["ID"]}" length="{Info["length"]}" maxSpeed="{Info["maxSpeed"]}" sigma="0.0" guiShape="passenger" />'''
             i += 1
