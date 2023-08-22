@@ -9,6 +9,7 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 - [Demo](#demo)
 - [Build Esmini](#build-esmini)
 - [Converge to csv](#converge-to-csv)
+- [Main Usage](#main-usage)
 - [License](#license)
 
 
@@ -116,6 +117,21 @@ run
 ```sh
 ./EnvironmentSimulator/Applications/odrplot/xodr.py
 ```
+
+# Main Usage
+
+1. Go to folder SUMOtest folder.
+```
+cd SUMOtest
+```
+
+2. Open start.bat file.
+   
+4. Follow the instructions in the terminal window.
+   
+6. The generating results are stored in the folder ./SUMOtest/outputfolder_xxx, xxx is the file name of .xosc file.
+   
+
 
 
 # License
