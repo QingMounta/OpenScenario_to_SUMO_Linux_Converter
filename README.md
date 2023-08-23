@@ -10,6 +10,7 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 - [Build Esmini](#build-esmini)
 - [Converge to csv](#converge-to-csv)
 - [Main Usage](#main-usage)
+- [Unity Connection](#unity-connection)
 - [License](#license)
 
 
@@ -131,7 +132,13 @@ cd SUMOtest
 4. Follow the instructions in the terminal window.
    
 6. The generating results are stored in the folder ./SUMOtest/outputfolder_xxx, xxx is the file name of .xosc file.
-   
+
+
+# Unity Connection
+
+1. Change the Offset according to the offset information generated in infos4unity.txt (To Do)
+2. Change the name of the ego participant as "Ego"
+3. Use the model generated in the folder xxx (To Do)
 
 
 
