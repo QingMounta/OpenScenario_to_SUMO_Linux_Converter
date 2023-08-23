@@ -67,8 +67,9 @@ if !errorlevel! equ 0 (
     cd ..
     move "full_log.csv" "SUMOtest\outputfolder_%filename%\"
     cd .\SUMOtest\
+    move "infos4unity.txt" "outputfolder_%filename%\"
     @REM move "sim.csv" "outputfolder_%filename%\"
-    python TraciFile.py "%filename%"
+    python TraciFile_copy.py "%filename%"
 ) else (
     REM Display an error message
     echo Failed to convert the file.

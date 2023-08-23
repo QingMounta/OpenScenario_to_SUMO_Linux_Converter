@@ -348,6 +348,12 @@ if __name__ == '__main__':
     offset_x = float(offset_data[0]) #FourWaySignalL: 117,21; Circle: 233.85
     offset_y = float(offset_data[1]) #FourWaySignalL: 80.39; Circle: 109.72
 
+    with open("infos4unity.txt", "w") as file:
+        # write value of offset_x
+        file.write(f"offset_x: {offset_x}\n")
+    
+        # write value of offset_y
+        file.write(f"offset_y: {offset_y}\n")
     
 
     # start sumo
@@ -372,7 +378,7 @@ if __name__ == '__main__':
         traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
         traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
         
-    traci.vehicle.add("bike1", "InitialRoute", typeID="Car")  ## change the bike1 with any other name of your ego participant set in unity
+    traci.vehicle.add("Ego", "InitialRoute", typeID="Car")  ## change the bike1 with any other name of your ego participant set in unity
 
     # Creating a dictionary to store Vehicle objects with their IDs as keys
     vehicles = {}
@@ -551,7 +557,7 @@ if __name__ == '__main__':
         traci.route.add(Route_ID, vehicles[Vehicle_ID].route)
         traci.vehicle.add(Vehicle_ID, Route_ID, typeID="Car")
         traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
-    traci.vehicle.add("bike1", "InitialRoute1", typeID="Car")
+    traci.vehicle.add("Ego", "InitialRoute1", typeID="Car")
     
     # net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
 
@@ -574,7 +580,7 @@ if __name__ == '__main__':
         try:
 
             msg = json.loads(server.messageReceived)
-            traci.vehicle.moveToXY("bike1","", 1 ,msg["positionX"],msg["positionY"],msg["rotation"],2)
+            traci.vehicle.moveToXY("Ego","", 1 ,msg["positionX"],msg["positionY"],msg["rotation"],2)
             distance = []
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
