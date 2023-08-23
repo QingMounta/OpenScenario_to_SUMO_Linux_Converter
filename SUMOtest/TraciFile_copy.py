@@ -329,11 +329,22 @@ if __name__ == '__main__':
     dt = 0.025
 
     #Get offset
-    net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
-    with open("outputfolder_"+filename+"/"+filename+".net.xml", 'r') as file:
+    # net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
+    # with open("outputfolder_"+filename+"/"+filename+".net.xml", 'r') as file:
+    #     for line in file:
+    #         if 'location netOffset' in line:
+    #             offset_data = line.strip().split('"')[1].split(',')   
+    retval = os.getcwd()
+
+    os.chdir( retval+"/outputfolder_"+filename )
+    print(os.getcwd())
+    net = sumolib.net.readNet("OpenSCENARIO_output.net.xml")
+    with open("OpenSCENARIO_output.net.xml", 'r') as file:
         for line in file:
             if 'location netOffset' in line:
                 offset_data = line.strip().split('"')[1].split(',')   
+    os.chdir( retval )
+    
     offset_x = float(offset_data[0]) #FourWaySignalL: 117,21; Circle: 233.85
     offset_y = float(offset_data[1]) #FourWaySignalL: 80.39; Circle: 109.72
 
@@ -361,7 +372,7 @@ if __name__ == '__main__':
         traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
         traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
         
-    traci.vehicle.add("Ego", "InitialRoute", typeID="Car")
+    traci.vehicle.add("bike1", "InitialRoute", typeID="Car")  ## change the bike1 with any other name of your ego participant set in unity
 
     # Creating a dictionary to store Vehicle objects with their IDs as keys
     vehicles = {}
@@ -540,9 +551,10 @@ if __name__ == '__main__':
         traci.route.add(Route_ID, vehicles[Vehicle_ID].route)
         traci.vehicle.add(Vehicle_ID, Route_ID, typeID="Car")
         traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
-    traci.vehicle.add("Ego", "InitialRoute1", typeID="Car")
+    traci.vehicle.add("bike1", "InitialRoute1", typeID="Car")
     
-    net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
+    # net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
+
     # while step < trajectories.shape[0]-1:
     for _ in range(int(10/dt)):
         traci.simulationStep()
@@ -562,7 +574,7 @@ if __name__ == '__main__':
         try:
 
             msg = json.loads(server.messageReceived)
-            traci.vehicle.moveToXY("Ego","", 1 ,msg["positionX"],msg["positionY"],msg["rotation"],2)
+            traci.vehicle.moveToXY("bike1","", 1 ,msg["positionX"],msg["positionY"],msg["rotation"],2)
             distance = []
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 

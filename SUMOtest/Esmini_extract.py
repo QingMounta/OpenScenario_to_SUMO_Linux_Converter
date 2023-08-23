@@ -53,6 +53,7 @@ esmini_lib.SE_Init(b"../resources/xosc/cut-in.xosc", 1, 1, 0, 0, 2)
 obj_state = SEScenarioObjectState()  # object that will be passed and filled in with object state info
 
 esmini_lib.SE_StepDT.argtypes = [ctypes.c_float]
+
 for i in range(500):
     for j in range(esmini_lib.SE_GetNumberOfObjects()):
         esmini_lib.SE_GetObjectState(esmini_lib.SE_GetId(j), ctypes.byref(obj_state))

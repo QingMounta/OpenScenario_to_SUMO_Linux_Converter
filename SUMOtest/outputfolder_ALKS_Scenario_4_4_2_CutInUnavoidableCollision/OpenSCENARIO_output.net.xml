@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-08-23 14:40:54 by Eclipse SUMO netconvert Version 1.18.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <opendrive-files value="..\resources\myresources\OSC-ALKS-scenarios\Scenarios\ALKS_Road_straight.xodr"/>
+    </input>
+
+    <output>
+        <output-file value="outputfolder_ALKS_Scenario_4_4_2_CutInUnavoidableCollision\OpenSCENARIO_output.net.xml"/>
+    </output>
+
+    <junctions>
+        <no-turnarounds.except-deadend value="true"/>
+    </junctions>
+
+</configuration>
+-->
+
+<net version="1.16" junctionCornerDetail="5" rectangularLaneCut="true" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,2.75" convBoundary="0.00,0.00,10000.00,5.50" origBoundary="0.00,0.00,10000.00,0.00" projParameter="!"/>
+
+
+    <edge id=":0.begin_0" function="internal">
+        <lane id=":0.begin_0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="5.47" length="13.14" width="3.50" shape="0.00,7.25 -3.38,5.00 -4.50,2.75 -3.38,0.50 0.00,-1.75"/>
+    </edge>
+    <edge id=":0.end_0" function="internal">
+        <lane id=":0.end_0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="5.47" length="13.14" width="3.50" shape="10000.00,-1.75 10003.38,0.50 10004.50,2.75 10003.38,5.00 10000.00,7.25"/>
+    </edge>
+
+    <edge id="-0" from="0.begin" to="0.end" priority="1" type="stop|driving|driving|driving" shape="0.00,0.00 10000.00,0.00">
+        <lane id="-0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.00" shape="0.00,-12.00 10000.00,-12.00" type="stop"/>
+        <lane id="-0_1" index="1" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.50" shape="0.00,-8.75 10000.00,-8.75" type="driving"/>
+        <lane id="-0_2" index="2" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.50" shape="0.00,-5.25 10000.00,-5.25" type="driving"/>
+        <lane id="-0_3" index="3" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.50" shape="0.00,-1.75 10000.00,-1.75" type="driving"/>
+    </edge>
+    <edge id="0" from="0.end" to="0.begin" priority="1" type="stop|driving|driving|driving" shape="10000.00,5.50 0.00,5.50">
+        <lane id="0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.00" shape="10000.00,17.50 0.00,17.50" type="stop"/>
+        <lane id="0_1" index="1" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.50" shape="10000.00,14.25 0.00,14.25" type="driving"/>
+        <lane id="0_2" index="2" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.50" shape="10000.00,10.75 0.00,10.75" type="driving"/>
+        <lane id="0_3" index="3" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship" speed="13.89" length="10000.00" width="3.50" shape="10000.00,7.25 0.00,7.25" type="driving"/>
+    </edge>
+
+    <junction id="0.begin" type="priority" x="0.00" y="2.75" incLanes="0_0 0_1 0_2 0_3" intLanes=":0.begin_0_0" shape="0.00,0.00 0.00,19.00 0.00,5.50">
+        <request index="0" response="0" foes="0" cont="0"/>
+    </junction>
+    <junction id="0.end" type="priority" x="10000.00" y="2.75" incLanes="-0_0 -0_1 -0_2 -0_3" intLanes=":0.end_0_0" shape="10000.00,5.50 10000.00,-13.50 10000.00,0.00">
+        <request index="0" response="0" foes="0" cont="0"/>
+    </junction>
+
+    <connection from="-0" to="0" fromLane="3" toLane="3" via=":0.end_0_0" dir="t" state="M"/>
+    <connection from="0" to="-0" fromLane="3" toLane="3" via=":0.begin_0_0" dir="t" state="M"/>
+
+    <connection from=":0.begin_0" to="-0" fromLane="0" toLane="3" dir="t" state="M"/>
+    <connection from=":0.end_0" to="0" fromLane="0" toLane="3" dir="t" state="M"/>
+
+</net>

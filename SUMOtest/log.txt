@@ -2,67 +2,9 @@ esmini GIT REV: N/A
 esmini GIT TAG: N/A
 esmini GIT BRANCH: N/A
 esmini BUILD VERSION: N/A - client build
-Disable entity controllers
-Generated seed 1047201624
-Loading ../resources/xosc/./cut-in.xosc (v1.1)
+Run simulation decoupled from realtime, with fixed timestep: 0.03
+Generated seed 752448121
+Loading ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./original.xosc (v1.1)
 0 variables
-Unsupported geo reference attr: +no_defs
-Unsupported object type: rail-pole - interpret as NONE
-Unsupported object type: rail-pole - interpret as NONE
-Unsupported object type: guide-post - interpret as NONE
-Unsupported object type: guide-post - interpret as NONE
-Loaded OpenDRIVE: ../resources/xosc/./../xodr/e6mini.xodr
-Expr ${250/3.6} = 250/3.6 = 69.4444444444
-Expr ${$EgoSpeed / 3.6} = 108 / 3.6 = 30.0000000000
-7 parameters:
-   TargetSpeedFactor = 1.2
-   EgoSpeed = 108
-   HeadwayTime_Brake = 0.7
-   HeadwayTime_LaneChange = 0.4
-   EgoStartS = 50
-   TargetVehicle = car_red
-   HostVehicle = car_white
-0.000: Loaded scenegraph: ../resources/xosc/../models/e6mini.osgb
-0.000: Object ../models/railing-pole.osgb missing length, set to bounding box length 0.10
-0.000: Object ../models/railing-pole.osgb missing width, set to bounding box width 0.10
-0.000: Object ../models/railing-pole.osgb missing height, set to bounding box height 1.00
-0.000: Object ../models/railing-pole.osgb missing length, set to bounding box length 0.10
-0.000: Object ../models/railing-pole.osgb missing width, set to bounding box width 0.10
-0.000: Object ../models/railing-pole.osgb missing height, set to bounding box height 1.00
-0.000: Object ../models/railing.osgb missing length, set to bounding box length 4.00
-0.000: Object ../models/railing.osgb missing width, set to bounding box width 0.10
-0.000: Object ../models/railing.osgb missing height, set to bounding box height 0.20
-0.000: Object ../models/railing.osgb missing length, set to bounding box length 4.00
-0.000: Object ../models/railing.osgb missing width, set to bounding box width 0.10
-0.000: Object ../models/railing.osgb missing height, set to bounding box height 0.20
-0.000: Object ../models/guide-post.osgb missing length, set to bounding box length 0.08
-0.000: Object ../models/guide-post.osgb missing width, set to bounding box width 0.13
-0.000: Object ../models/guide-post.osgb missing height, set to bounding box height 1.25
-0.000: Object ../models/guide-post.osgb missing length, set to bounding box length 0.08
-0.000: Object ../models/guide-post.osgb missing width, set to bounding box width 0.13
-0.000: Object ../models/guide-post.osgb missing height, set to bounding box height 1.25
-0.000: Adjusted Ego bounding box to model car_white.osgb - xyz: 1.46, 0.00, 0.77 lwh: 5.04, 2.04, 1.49
-0.000: Adjusted OverTaker bounding box to model car_red.osgb - xyz: 1.46, 0.00, 0.77 lwh: 5.04, 2.04, 1.49
-0.000: Starting teleport Action
-0.000: Ego New position:
-0.000: Pos(8.17, 49.97, -0.04) Rot(1.57, 0.00, 0.00) roadId 0 laneId -3 offset 0.00 t -8.00
-0.000: Init Ego TeleportAction standbyState -> startTransition -> runningState
-0.000: Init Ego LongitudinalAction standbyState -> startTransition -> runningState
-0.000: Starting teleport Action
-0.000: OverTaker New position:
-0.000: Pos(4.51, 24.98, -0.01) Rot(1.57, 0.00, 0.00) roadId 0 laneId -2 offset 0.00 t -4.42
-0.000: Init OverTaker TeleportAction standbyState -> startTransition -> runningState
-0.000: Init Ego TeleportAction runningState -> endTransition -> completeState
-0.000: Init Ego LongitudinalAction runningState -> endTransition -> completeState
-0.000: Init OverTaker TeleportAction runningState -> endTransition -> completeState
-0.020: Trigger /------------------------------------------------
-0.020: CutInActStart == true, 0.0200 > 0.00 edge: none
-0.020: Trigger  ------------------------------------------------/
-0.020: CutInManeuver standbyState -> startTransition -> runningState
-0.020: CutInAndBrakeSequence standbyState -> startTransition -> runningState
-0.020: CutInAndBrakeAct standbyState -> startTransition -> runningState
-0.020: Trigger /------------------------------------------------
-0.020: OverTakerStartSpeedCondition == true, element: CutInAndBrakeAct state: START_TRANSITION, edge: none
-0.020: Trigger  ------------------------------------------------/
-0.040: OverTakerStartSpeedAction standbyState -> startTransition -> runningState
-0.040: OverTakerStartSpeedEvent standbyState -> startTransition -> runningState
+Loaded OpenDRIVE: ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/././ALKS_Road_straight.xodr
+Exception: Couldn't locate catalog file: ControllerCatalog. Internal error occurred

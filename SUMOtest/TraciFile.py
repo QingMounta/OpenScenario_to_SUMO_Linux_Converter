@@ -56,7 +56,7 @@ class SocketServerSimple:
                 #print(receivedData)
                 pass
             time.sleep(self.delta)
-        sock.close()
+            sock.close()
 
 def TraciServer(server,dt):
     if 'SUMO_HOME' in os.environ:
@@ -309,7 +309,6 @@ if __name__ == '__main__':
     filename = sys.argv[1]
 
 
-    
 
     # from full_log.csv
     trajectories = pd.read_csv("outputfolder_"+filename+"/full_log.csv",sep=",",header=6)
@@ -329,11 +328,29 @@ if __name__ == '__main__':
     dt = 0.025
 
     #Get offset
-    net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
-    with open("outputfolder_"+filename+"/"+filename+".net.xml", 'r') as file:
+    # containfile = os.path.exists("outputfolder_"+filename+"/"+filename+".net.xml")
+    # containfile = os.path.exists("C:/Users/CargoBike/Documents/Unity Projects/OpenSCENARIO2SUMO-sumo-unity-atCity-presentation-tum-vt - Kopie/OpenSCENARIO2SUMO_preparation/esmini-2.31.9/SUMOtest/outputfolder_ALKS_Scenario_4.4_2_CutInUnavoidableCollision_TEMPLATE/ALKS_Scenario_4.4_2_CutInUnavoidableCollision_TEMPLATE.net.xml")
+    # containfile = os.path.exists("C:/Users/CargoBike/Documents/Unity Projects/Kopie-sumo-unity-atCity-presentation-tum-vt/SUMO/sumoNet2.net.xml")
+    # containfile = os.path.exists("sumoNet2.net.xml")
+    # print(containfile)  
+    retval = os.getcwd()
+
+    os.chdir( retval+"/outputfolder_"+filename )
+    print(os.getcwd())
+    net = sumolib.net.readNet("OpenSCENARIO_output.net.xml")
+    with open("OpenSCENARIO_output.net.xml", 'r') as file:
         for line in file:
             if 'location netOffset' in line:
                 offset_data = line.strip().split('"')[1].split(',')   
+    os.chdir( retval )
+
+    # net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
+    # with open("outputfolder_"+filename+"/"+filename+".net.xml", 'r') as file:
+    #     for line in file:
+    #         if 'location netOffset' in line:
+    #             offset_data = line.strip().split('"')[1].split(',')   
+
+
     offset_x = float(offset_data[0]) #FourWaySignalL: 117,21; Circle: 233.85
     offset_y = float(offset_data[1]) #FourWaySignalL: 80.39; Circle: 109.72
 
@@ -546,7 +563,7 @@ if __name__ == '__main__':
         traci.vehicle.setLaneChangeMode(Vehicle_ID, 0)
     # traci.vehicle.add("Ego", "InitialRoute1", typeID="Car")
     
-    net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
+    # net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
 
     
     for _ in range(int(10/dt)):

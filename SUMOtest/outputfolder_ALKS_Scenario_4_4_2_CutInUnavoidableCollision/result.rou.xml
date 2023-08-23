@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-08-23 14:40:55 by Eclipse SUMO duarouter Version 1.18.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="outputfolder_ALKS_Scenario_4_4_2_CutInUnavoidableCollision\OpenSCENARIO_output.net.xml"/>
+        <route-files value="outputfolder_ALKS_Scenario_4_4_2_CutInUnavoidableCollision\trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="outputfolder_ALKS_Scenario_4_4_2_CutInUnavoidableCollision\result.rou.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vehicle id="0" depart="0.00">
+        <route edges="0 -0"/>
+    </vehicle>
+</routes>

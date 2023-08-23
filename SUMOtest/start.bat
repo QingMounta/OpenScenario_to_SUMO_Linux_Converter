@@ -17,33 +17,35 @@ set "currentFolder=%CD%"
 @REM REM Navigate back to the previous folder
 @REM cd "%currentFolder%"
 
-REM Prompt the user to enter the opendrive file path (e.g., resources\myresources\Circle\circle.xodr)
+REM Prompt the user to enter the opendrive file path (e.g., resources\myresources\Circle)
 set /p filepath=Enter the opendrive file path (e.g., resources\myresources\Circle): 
 
 REM Prompt the user to enter the xosc filename (e.g., circle)
-set /p filename=Enter the xosc filename (e.g., circle): 
+set /p filename=Enter the xosc filename (e.g., circle). Please name your xodr file only with letters, numbers and underscore.: 
 
-REM Prompt the user to enter the xodr filename (e.g., circle)
-set /p odrfilename=Enter the xodr filename (e.g., circle): 
+REM Prompt the user to enter the xodr filename (e.g., circle). 
+set /p odrfilename=Enter the xodr filename (e.g., circle). Please name your xodr file only with letters, numbers and underscore.: 
 
 REM Run esmini command
 @REM ..\bin\esmini --window 60 60 800 400 --osc ..\%filepath%\%filename%.xosc --fixed_timestep 0.025 --record sim.dat
 @REM ..\bin\dat2csv sim.dat
-..\bin\esmini --osc ..\%filepath%\%filename%.xosc --fixed_timestep 0.025 --csv_logger full_log.csv --collision
+cd ..
+.\bin\esmini --osc .\%filepath%\%filename%.xosc --fixed_timestep 0.025 --csv_logger full_log.csv --collision
+cd .\SUMOtest\
 
 REM Create the output folder using the user-defined filename
 mkdir "outputfolder_%filename%"
 
 REM Run the netconvert command with the modified file path and filename
-netconvert --opendrive "..\%filepath%\%odrfilename%.xodr" -o "outputfolder_%filename%\%filename%.net.xml"
+netconvert --opendrive "..\%filepath%\%odrfilename%.xodr" -o "outputfolder_%filename%\OpenSCENARIO_output.net.xml"
 
 REM Check if the netconvert command was successful
 if !errorlevel! equ 0 (
     REM Create the contents of the .sumocfg file
     echo ^<configuration^> > "outputfolder_%filename%\simulation.sumocfg"
     echo     ^<input^> >> "outputfolder_%filename%\simulation.sumocfg"
-    echo         ^<net-file value="%filename%.net.xml"/^> >> "outputfolder_%filename%\simulation.sumocfg"
-    echo         ^<route-files value="%filename%.rou.xml"/^> >> "outputfolder_%filename%\simulation.sumocfg"
+    echo         ^<net-file value="OpenSCENARIO_output.net.xml"/^> >> "outputfolder_%filename%\simulation.sumocfg"
+    echo         ^<route-files value="OpenSCENARIO_output.rou.xml"/^> >> "outputfolder_%filename%\simulation.sumocfg"
     echo     ^</input^> >> "outputfolder_%filename%\simulation.sumocfg"
     echo     ^<time^> >> "outputfolder_%filename%\simulation.sumocfg"
     echo         ^<begin value="0"/^> >> "outputfolder_%filename%\simulation.sumocfg"
@@ -56,14 +58,16 @@ if !errorlevel! equ 0 (
     echo outputfolder_%filename%\simulation.sumocfg file written successfully.
 
     REM Run the remaining commands with the modified filename
-    python randomTrips.py -n "outputfolder_%filename%\%filename%.net.xml" -e 1 --allow-fringe
+    python randomTrips.py -n "outputfolder_%filename%\OpenSCENARIO_output.net.xml" -e 1 --allow-fringe
     move "trips.trips.xml" "outputfolder_%filename%\"
-    duarouter --trip-files "outputfolder_%filename%\trips.trips.xml" --net-file "outputfolder_%filename%\%filename%.net.xml" --output-file "outputfolder_%filename%\result.rou.xml"
+    duarouter --trip-files "outputfolder_%filename%\trips.trips.xml" --net-file "outputfolder_%filename%\OpenSCENARIO_output.net.xml" --output-file "outputfolder_%filename%\result.rou.xml"
     python xml2csv.py "outputfolder_%filename%\result.rou.xml"
     copy "vehicleType.rou.xml" "outputfolder_%filename%\"
-    move "outputfolder_%filename%\vehicleType.rou.xml" "outputfolder_%filename%\%filename%.rou.xml"
-    move "full_log.csv" "outputfolder_%filename%\"
-    move "sim.csv" "outputfolder_%filename%\"
+    move "outputfolder_%filename%\vehicleType.rou.xml" "outputfolder_%filename%\OpenSCENARIO_output.rou.xml"
+    cd ..
+    move "full_log.csv" "SUMOtest\outputfolder_%filename%\"
+    cd .\SUMOtest\
+    @REM move "sim.csv" "outputfolder_%filename%\"
     python TraciFile.py "%filename%"
 ) else (
     REM Display an error message

@@ -1,7 +1,7 @@
 <configuration> 
     <input> 
-        <net-file value="ALKS_Scenario_4.4_2_CutInUnavoidableCollision_TEMPLATE.net.xml"/> 
-        <route-files value="ALKS_Scenario_4.4_2_CutInUnavoidableCollision_TEMPLATE.rou.xml"/> 
+        <net-file value="output.net.xml"/> 
+        <route-files value="output.rou.xml"/> 
     </input> 
     <time> 
         <begin value="0"/> 

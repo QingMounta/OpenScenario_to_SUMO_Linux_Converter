@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2023-07-25 10:55:46 by Eclipse SUMO duarouter Version 1.13.0
+<!-- generated on 2023-08-22 11:03:21 by Eclipse SUMO duarouter Version 1.18.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
 
     <input>
@@ -10,7 +10,6 @@
 
     <output>
         <output-file value="outputfolder_ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE\result.rou.xml"/>
-        <alternatives-output value="outputfolder_ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE\result.rou.alt.xml"/>
     </output>
 
 </configuration>
