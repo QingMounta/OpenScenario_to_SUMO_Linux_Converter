@@ -136,7 +136,7 @@ cd SUMOtest
 
 # Unity Connection
 
-1. Change the Offset according to the offset information generated in infos4unity.txt (To Do)
+1. Change the Offset according to the offset information generated in infos4unity.txt 
 2. Change the name of the ego participant as "Ego"
 3. Use the model generated in the folder xxx (To Do)
 
