@@ -13,7 +13,7 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 - [Converge to csv](#converge-to-csv)
 
 
-## Prerequisites
+# Prerequisites
 
 Before getting started, ensure you have the following prerequisites:
 
@@ -21,7 +21,7 @@ Before getting started, ensure you have the following prerequisites:
 - SUMO: The project utilizes SUMO [tested version: 17.0, 18.0]. Install SUMO by following the official instructions [link to SUMO installation guide].
 - Required Python packages: 
 
-## Installation
+# Installation
 [(Back to top)](#table-of-contents)
 
 1. Clone the repository:
