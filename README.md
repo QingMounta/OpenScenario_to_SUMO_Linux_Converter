@@ -14,12 +14,18 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 
 
 # Prerequisites
+[(Back to top)](#table-of-contents)
 
 Before getting started, ensure you have the following prerequisites:
 
-- Python: The project requires Python [tested versions: 3.10, 3.11]. Make sure you have Python installed.
-- SUMO: The project utilizes SUMO [tested version: 17.0, 18.0]. Install SUMO by following the official instructions [link to SUMO installation guide].
-- Required Python packages: 
+
+- Operating System: Windows
+- Python: The project requires Python [tested versions: '3.10', '3.11']. Make sure you have Python installed.
+- SUMO: The project utilizes SUMO [tested version: 17.0, 18.0]. Install SUMO by following the official instructions
+  [link to SUMO installation guide](https://sumo.dlr.de/docs/Installing/index.html).
+- Required Python packages:
+
+The usage of the Anaconda Python distribution is strongly recommended.
 
 # Installation
 [(Back to top)](#table-of-contents)
