@@ -2,9 +2,50 @@ esmini GIT REV: N/A
 esmini GIT TAG: N/A
 esmini GIT BRANCH: N/A
 esmini BUILD VERSION: N/A - client build
-Run simulation decoupled from realtime, with fixed timestep: 0.03
-Generated seed 752448121
-Loading ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/./original.xosc (v1.1)
+Disable entity controllers
+Generated seed 2729184255
+Loading ../resources/myresources/OSC-ALKS-scenarios/Scenarios/./ALKS_Scenario_4_4_2_CutInUnavoidableCollision.xosc (v1.1)
 0 variables
-Loaded OpenDRIVE: ..\resources\myresources\OSC-ALKS-scenarios\Scenarios/././ALKS_Road_straight.xodr
-Exception: Couldn't locate catalog file: ControllerCatalog. Internal error occurred
+Loaded OpenDRIVE: ../resources/myresources/OSC-ALKS-scenarios/Scenarios/././ALKS_Road_straight.xodr
+Expr ${$Ego_InitSpeed_Ve0_kph / 3.6} = 60.0 / 3.6 = 16.6666666667
+Expr ${$CutInVehicle_HeadwayDistanceTrigger_dx0_m + (-10.0 * ($CutInVehicle_RelativeInitSpeed_Ve0_Vo0_kph / 3.6))} = 10.0 + (-10.0 * (-20.0 / 3.6)) = 65.5555555556
+Expr ${$CutInVehicle_RelativeInitSpeed_Ve0_Vo0_kph / 3.6} = -20.0 / 3.6 = -5.5555555556
+Failed to parse event ActivateALKSControllerEvent - continue regardless
+Expr ${$CutInVehicle_Acceleration_Target_kph / 3.6} = 40.0 / 3.6 = 11.1111111111
+8 parameters:
+   CutInVehicle_Acceleration_Target_kph = 40.0
+   CutInVehicle_Acceleration_Rate_mps2 = 0.0
+   CutInVehicle_LaneChange_MaxLateralVelocity_Vy_mps = 3.0
+   CutInVehicle_HeadwayDistanceTrigger_dx0_m = 10.0
+   CutInVehicle_RelativeInitSpeed_Ve0_Vo0_kph = -20.0
+   CutInVehicle_InitPosition_RelativeLaneId = -1
+   CutInVehicle_Model = car
+   Ego_InitSpeed_Ve0_kph = 60.0
+0.000: No scenegraph 3D model loaded. Generating a simplistic one...
+0.000: Starting teleport Action
+0.000: Ego New position:
+0.000: Pos(5.00, -8.00, 0.00) Rot(0.00, 0.00, 0.00) roadId 0 laneId -4 offset 0.00 t -8.00
+0.000: Init Ego TeleportAction standbyState -> startTransition -> runningState
+0.000: Init Ego LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Starting teleport Action
+0.000: CutInVehicle New position:
+0.000: Pos(70.56, -11.50, 0.00) Rot(0.00, 0.00, 0.00) roadId 0 laneId -5 offset 0.00 t -11.50
+0.000: Init CutInVehicle TeleportAction standbyState -> startTransition -> runningState
+0.000: Init CutInVehicle LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Init Ego TeleportAction runningState -> endTransition -> completeState
+0.000: Init Ego LongitudinalAction runningState -> endTransition -> completeState
+0.000: Init CutInVehicle TeleportAction runningState -> endTransition -> completeState
+0.000: Init CutInVehicle LongitudinalAction runningState -> endTransition -> completeState
+0.000: Trigger /------------------------------------------------
+0.000: ActivateALKSControllerActCondition == true, 0.0000 >= 0.00 edge: none
+0.000: Trigger  ------------------------------------------------/
+0.000: ActivateALKSControllerManeuver standbyState -> startTransition -> runningState
+0.000: ActivateALKSControllerManeuverGroup standbyState -> startTransition -> runningState
+0.000: ActivateALKSControllerAct standbyState -> startTransition -> runningState
+0.000: Trigger /------------------------------------------------
+0.000: CutInActStart == true, 0.0000 >= 0.00 edge: none
+0.000: Trigger  ------------------------------------------------/
+0.000: CutInManeuver standbyState -> startTransition -> runningState
+0.000: CutInManeuverGroup standbyState -> startTransition -> runningState
+0.000: CutInAct standbyState -> startTransition -> runningState
+DataFrame written to loggingTrajectories.xlsx
