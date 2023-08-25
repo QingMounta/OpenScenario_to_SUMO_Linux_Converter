@@ -267,51 +267,9 @@ def getNearestPos(ID,Vehicle_Num,logging4sumo,vehicle_pos,threshold):
         return min_index
     else:
         return float('inf')
-
-# ---=========---
-#      MAIN
-# ---=========---
-if __name__ == '__main__':
-    # filename = 'SUMO_trafficflow.json'
-    # if os.path.exists(filename):
-    #     with open (filename,'r+') as ff:
-    #         read_data = ff.read()
-    #         ff.seek(0)
-    #         ff.truncate()
-    # else:
-    #     ff = open (filename,'x')
-    # dt = 0.0167
-    # server = SocketServerSimple("127.0.0.1",25001,dt)
-    # server.messageToSend = "default"
-
-    # thread1 = threading.Thread(target=server.start)
-    # thread2 = threading.Thread(target=TraciServer, args=(server,dt))
-
-    # thread1.start()
-    # thread2.start()
-
-    # serverArd = SocketServerSimple("127.0.0.1", 25002,dt)
-    # serverArd.messageToSend = "default"
-
-    # thread3 = threading.Thread(target=serverArd.start)
-    # thread4 = threading.Thread(target=ArduinoConnection, args=(serverArd,dt))
-    # thread3.start()
-    # thread4.start()
-
-
-
-
-    if len(sys.argv) < 2:
-        print("Usage: python your_script.py <filename>")
-        sys.exit(1)
-
-
-    filename = sys.argv[1]
-
-
     
-
-    # from full_log.csv
+def OpenscenarioInfoConvert(filename):
+    # Reorganize full_log.csv
     trajectories = pd.read_csv("outputfolder_"+filename+"/full_log.csv",sep=",",header=6)
     Vehicle_Num=int((trajectories.shape[1] - 3) / 31)
 
@@ -319,23 +277,14 @@ if __name__ == '__main__':
 
     # Write the DataFrame to Excel
     trajectories.to_excel(excel_file_path, index=False)
-
-    
-    
-
     
 
     ## sampling time
     dt = 0.025
 
-    #Get offset
-    # net = sumolib.net.readNet("outputfolder_"+filename+"/"+filename+".net.xml")
-    # with open("outputfolder_"+filename+"/"+filename+".net.xml", 'r') as file:
-    #     for line in file:
-    #         if 'location netOffset' in line:
-    #             offset_data = line.strip().split('"')[1].split(',')   
-    retval = os.getcwd()
 
+    #Get Offset and write into infos4unity.txt
+    retval = os.getcwd()
     os.chdir( retval+"/outputfolder_"+filename )
     print(os.getcwd())
     net = sumolib.net.readNet("OpenSCENARIO_output.net.xml")
@@ -351,9 +300,13 @@ if __name__ == '__main__':
     with open("infos4unity.txt", "w") as file:
         # write value of offset_x
         file.write(f"offset_x: {offset_x}\n")
-    
         # write value of offset_y
         file.write(f"offset_y: {offset_y}\n")
+    
+    
+    # ==============================
+    # Convert Trajectory (point at the defined middle point of each participant) to Trajectory used in SUMO, store in loggingData4SUMO.xlsx
+    # ==============================
     
 
     # start sumo
@@ -372,7 +325,7 @@ if __name__ == '__main__':
     # initialization
     traci.route.add("InitialRoute", randomRoute)
 
-    print(randomRoute)
+    # print(randomRoute)
     for iter in range(1,Vehicle_Num+1):
         Vehicle_ID =  "vehicle" + str(iter) 
         traci.vehicle.add(Vehicle_ID, "InitialRoute", typeID="Car")
@@ -521,27 +474,10 @@ if __name__ == '__main__':
     logging4sumo.to_excel(excel_file, index=False)
 
 
+    return Vehicle_Num, vehicles, logging4sumo, net
 
 
-
-
-
-
-    ## sampling time
-    dt = 0.025
-
-
-    server = SocketServerSimple("127.0.0.1",25001,dt)
-    server.messageToSend = "default"
-
-    thread1 = threading.Thread(target=server.start)
-
-    thread1.start()
-
-
-
-    
-
+def TraciSUMOServer(server,dt,filename,Vehicle_Num, vehicles, logging4sumo, net):
     # start sumo
     traci.start(["sumo-gui","-c", "outputfolder_"+filename+"/simulation.sumocfg","--num-clients", "1"])
     # traci.start(["sumo","-c", "outputfolder_"+filename+"/simulation.sumocfg","--num-clients", "1"])
@@ -574,7 +510,7 @@ if __name__ == '__main__':
         
 
         # ==============================
-        # Send Values from Unity to SUMO
+        # Send Values from Unity to SUMO (Detect distance between surronding vehicles and ego)
         # ==============================
         # Ego Vehicle
         try:
@@ -597,21 +533,27 @@ if __name__ == '__main__':
         except:
             pass
 
-        # print("now change2sumo: ",allChange2SUMO,"now changed: ",changed)
-         
-            # print(Vehicle_ID,"now change2sumo: ",vehicles[Vehicle_ID].change2sumo,"now changed: ",vehicles[Vehicle_ID].changed)
 
+
+
+        # ==============================
+        # Preparation for Values from SUMO to Unity (Detect obstacles to change between trajectory control and SUMO control)
+        # ==============================
+        
+        # Situation 1: Trajectory control: Not enconter any obstacles or change back from SUMO control
         if  allChange2SUMO == False and changed == False:
             
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
-
+                
+                # Situation 1.1: Not pass through the whole trajectory yet, while not encounter any obstacles
                 if Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and vehicles[Vehicle_ID].vehicle_pos_xosc_index == 0:
                     x_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_X[m]']
                     y_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Position_Y[m]']
                     angle_sumo = logging4sumo.loc[Vehicle_Num*step+iter-1]['World_Rotation_Z[m]']
                     traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)  
 
+                # Situation 1.2: Encounter >= 1 time the obstacle, and the position of surronding vehicles stay still inside the defined trajectory
                 elif 0 < vehicles[Vehicle_ID].vehicle_pos_xosc_index < logging4sumo.shape[0]:
                     vehicles[Vehicle_ID].vehicle_pos_xosc_index += Vehicle_Num
 
@@ -628,7 +570,7 @@ if __name__ == '__main__':
                 else:
                     break
 
-
+        # Situation 2: SUMO control: change from Trajectory control to SUMO control
         elif allChange2SUMO == True and changed == False:
 
             changed = True
@@ -637,13 +579,12 @@ if __name__ == '__main__':
                 Vehicle_ID =  "vehicle" + str(iter) 
                 
                 vehicle_pos_now = traci.vehicle.getPosition(Vehicle_ID)
-                # angle_final_degree = traci.vehicle.getAngle(Vehicle_ID)
-                # traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicle_pos_final[0],vehicle_pos_final[1],angle_final_degree,2)
                 lane = net.getNeighboringLanes(vehicle_pos_now[0], vehicle_pos_now[1], includeJunctions=False)[0][0]
                 pos_lane = lane.getClosestLanePosAndDist((vehicle_pos_now[0], vehicle_pos_now[1]))[0]
 
                 traci.vehicle.moveTo(Vehicle_ID, lane.getID(), pos_lane)  # not working on internal lanes
         
+        # Situation 3: Trajectory control: change back to trajectory control and check the most nearest transit point on the trajectory
         elif allChange2SUMO == False and changed == True:
             print("now change back to Trajectory following control, system is finding the nearest point on the trajectory for each participants, variable allchange2sumo is: ",allChange2SUMO,"changed is: ",changed) 
             for iter in range(1,Vehicle_Num+1):
@@ -664,24 +605,7 @@ if __name__ == '__main__':
                     break
             changed = False 
 
-        # elif Vehicle_Num*step+iter-1 < logging4sumo.shape[0] and allChange2SUMO == False and changed == False and vehicles[Vehicle_ID].vehicle_pos_xosc_index != 0:
-
-        #     for iter in range(1,Vehicle_Num+1):
-        #         Vehicle_ID =  "vehicle" + str(iter) 
-        #         vehicles[Vehicle_ID].vehicle_pos_xosc_index += Vehicle_Num
-
-        #         if vehicles[Vehicle_ID].vehicle_pos_xosc_index < logging4sumo.shape[0]:
-        #             x_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_X[m]']
-        #             y_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Position_Y[m]']
-        #             angle_sumo = logging4sumo.loc[vehicles[Vehicle_ID].vehicle_pos_xosc_index]['World_Rotation_Z[m]']
-        #             print(Vehicle_ID,x_sumo,y_sumo,angle_sumo)
-
-
-        #             traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,x_sumo,y_sumo,angle_sumo,2)    
-        
-        
-            
-# if vehicles[Vehicle_ID].vehicle_pos_xosc_index < logging4sumo.shape[0]:
+        # Situation 4: 
         elif allChange2SUMO == False:
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
@@ -727,6 +651,50 @@ if __name__ == '__main__':
         
     traci.close()
 
+    
+# ---=========---
+#      MAIN
+# ---=========---
+if __name__ == '__main__':
+
+
+
+
+    if len(sys.argv) < 2:
+        print("Usage: python your_script.py <filename>")
+        sys.exit(1)
+
+
+    filename = sys.argv[1]
+
+    # ==============================
+    # Convert Trajectory used in Openscenario to Trajectory used in SUMO, store in loggingData4SUMO.xlsx
+    #
+    # Vehicle_Num: Number of participants in the Openscenario scneario
+    # vehicles: Dictionary, store all the infos of each participants defined in the Openscenario scneario
+    # logging4sumo: Trajectory data suilt for SUMO
+    # net: Converted net from Opendrive map  
+    # ==============================
+    Vehicle_Num, vehicles, logging4sumo, net = OpenscenarioInfoConvert(filename)
+
+    ## sampling time
+    dt = 0.025
+
+
+    server = SocketServerSimple("127.0.0.1",25001,dt)
+    server.messageToSend = "default"
+
+    thread1 = threading.Thread(target=server.start)
+    thread2 = threading.Thread(target=TraciSUMOServer, args=(server,dt,filename,Vehicle_Num, vehicles, logging4sumo, net))
+
+    thread1.start()
+    thread2.start()
+
+
+
+    
+
+    
 
 
 
