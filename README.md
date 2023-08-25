@@ -4,50 +4,44 @@ Automatic traffic scenario conversion interface between OpenSCENARIO and the tra
 
 # Table of contents
 
-
-- [Installation](#installation)
-- [Demo](#demo)
+- [Prerequisites](#prerequisites)
+- [Installation of Esmini](#installation-of-esmini)
 - [Build Esmini](#build-esmini)
-- [Converge to csv](#converge-to-csv)
 - [Main Usage](#main-usage)
 - [Unity Connection](#unity-connection)
 - [License](#license)
+- [Converge to csv](#converge-to-csv)
 
 
-# Installation
+## Prerequisites
 
+Before getting started, ensure you have the following prerequisites:
+
+- Python: The project requires Python [tested versions: 3.10, 3.11]. Make sure you have Python installed.
+- SUMO: The project utilizes SUMO [tested version: 17.0, 18.0]. Install SUMO by following the official instructions [link to SUMO installation guide].
+- Required Python packages: 
+
+## Installation
 [(Back to top)](#table-of-contents)
 
+1. Clone the repository:
 
-1. Download latest release from [here](https://github.com/esmini/esmini/releases/latest)
-
-
-2. Pick the demo package for Windows.  
-Make sure the zip file is not blocked: Right click, click Properties, at bottom right check Unblock. For more info, see Blocked by Windows Defender SmartScreen.  
-To install the package, just unzip it anywhere. A single subfolder named esmini-demo is created.  
+   ```bash
+   git clone https://github.com/your-username/your-repo.git
+   ```
 
 
-4. Pick the package: esmini-(version) for Windows.   
-On Windows, make sure the zip file is not blocked: Right click, click Properties, at bottom right check Unblock. For more info, see Blocked by Windows Defender SmartScreen.  
-To install the package, just unzip it anywhere. A single subfolder named esmini-(version) is created. This is the root folder for esmini. No files are stored outside this folder structure and no system files or registry is modified in any way.  
+2. Installation of Esmini
+
+   1. Download latest release from [here](https://github.com/esmini/esmini/releases/latest)
 
 
+   2. Pick the package: esmini-(version) for Windows.   
+   On Windows, make sure the zip file is not blocked: Right click, click Properties, at bottom right check Unblock. For more info, see Blocked by Windows Defender SmartScreen.  
+   To install the package, just unzip it anywhere. A single subfolder named esmini-(version) is created. This is the root folder for esmini. No files are stored outside this folder structure and no system files or registry is modified in any way.  
 
-# Demo
+3. Move the SUMO_test into the folder esmini-(version)
 
-[(Back to top)](#table-of-contents)
-
-
-Try to run one of the examples:  
-
-go to folder esmini-demo/run/esmini  
-
-double click on a .bat file, e.g. run_cut-in.bat or run it from a command line.  
-
-You can also run the examples explicitly from a command line:  
-```sh
-./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc
-```
 
 
 # Build Esmini
@@ -72,6 +66,36 @@ After a successful build, the binaries will be copied into esmini-(version)/bin 
 ```sh
 ./bin/esmini --window 60 60 800 400 --osc ./resources/xosc/cut-in.xosc
 ```
+
+
+
+# Main Usage
+[(Back to top)](#table-of-contents)
+
+1. Go to folder SUMOtest folder.
+```
+cd SUMOtest
+```
+
+2. Open start.bat file.
+   
+4. Follow the instructions in the terminal window.
+   
+6. The generating results are stored in the folder ./SUMOtest/outputfolder_xxx, xxx is the file name of .xosc file.
+
+
+# Unity Connection
+
+1. Change the Offset according to the offset information generated in infos4unity.txt 
+2. Change the name of the ego participant as "Ego"
+3. Use the model generated in the folder xxx (To Do)
+
+
+
+# License
+
+[(Back to top)](#table-of-contents)
+
 
 # Converge to csv
 [(Back to top)](#table-of-contents)
@@ -118,34 +142,6 @@ run
 ```sh
 ./EnvironmentSimulator/Applications/odrplot/xodr.py
 ```
-
-# Main Usage
-[(Back to top)](#table-of-contents)
-
-1. Go to folder SUMOtest folder.
-```
-cd SUMOtest
-```
-
-2. Open start.bat file.
-   
-4. Follow the instructions in the terminal window.
-   
-6. The generating results are stored in the folder ./SUMOtest/outputfolder_xxx, xxx is the file name of .xosc file.
-
-
-# Unity Connection
-
-1. Change the Offset according to the offset information generated in infos4unity.txt 
-2. Change the name of the ego participant as "Ego"
-3. Use the model generated in the folder xxx (To Do)
-
-
-
-# License
-
-[(Back to top)](#table-of-contents)
-
 
 [Esmini](https://github.com/esmini/esmini.git)
 [Detailed User guide](https://esmini.github.io)
