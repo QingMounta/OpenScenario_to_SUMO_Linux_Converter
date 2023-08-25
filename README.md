@@ -21,9 +21,10 @@ Before getting started, ensure you have the following prerequisites:
 
 - Operating System: Windows
 - Python: The project requires Python [tested versions: '3.10', '3.11']. Make sure you have Python installed.
-- SUMO: The project utilizes SUMO [tested version: 17.0, 18.0]. Install SUMO by following the official instructions
+- SUMO: The project utilizes SUMO [tested version: 1.18.0]. Install SUMO by following the official instructions
   [link to SUMO installation guide](https://sumo.dlr.de/docs/Installing/index.html).
-- Required Python packages:
+- Required Python packages: numpy==1.25.2; openpyxl==3.1.2; pandas==2.0.3; pip==23.0.1; sumolib==1.16.0; traci==1.16.0
+
 
 The usage of the Anaconda Python distribution is strongly recommended.
 
