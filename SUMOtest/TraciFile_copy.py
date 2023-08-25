@@ -677,18 +677,33 @@ if __name__ == '__main__':
     # ==============================
     Vehicle_Num, vehicles, logging4sumo, net = OpenscenarioInfoConvert(filename)
 
+
+
     ## sampling time
     dt = 0.025
-
 
     server = SocketServerSimple("127.0.0.1",25001,dt)
     server.messageToSend = "default"
 
     thread1 = threading.Thread(target=server.start)
+
+    # ==============================
+    # Control the participants in the scenario by trajectory control or SUMO control depends on the distance between the participants and obstacles controled in unity. 
+    # ==============================
     thread2 = threading.Thread(target=TraciSUMOServer, args=(server,dt,filename,Vehicle_Num, vehicles, logging4sumo, net))
 
     thread1.start()
     thread2.start()
+
+
+
+    serverArd = SocketServerSimple("127.0.0.1", 25002,dt)
+    serverArd.messageToSend = "default"
+
+    thread3 = threading.Thread(target=serverArd.start)
+    thread4 = threading.Thread(target=ArduinoConnection, args=(serverArd,dt))
+    thread3.start()
+    thread4.start()
 
 
 
