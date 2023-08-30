@@ -5,7 +5,7 @@ import copy
 
 
 # Load the OpenSCENARIO file
-file_path = "../resources/myresources/OSC-ALKS-scenarios/Scenarios/ALKS_Scenario_4.2_3_CrossingPedestrian_TEMPLATE.xosc"
+file_path = "../resources/myresources/OSC-ALKS-scenarios/Scenarios/ALKS_Scenario_4_2_3_CrossingPedestrian_TEMPLATE.xosc"
 # file_path = "../resources/myresources/SampleScenarios/575d7e80-10e8-4f39-84b3-ddb52fbf6089.xosc"
 # file_path = "../resources/myresources/Circle/circle.xosc"
 tree = ET.parse(file_path)
