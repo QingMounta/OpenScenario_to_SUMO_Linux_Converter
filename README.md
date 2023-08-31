@@ -29,6 +29,8 @@ Before you start, make sure you have the following prerequisites ready.
     - pip==23.0.1
     - sumolib==1.16.0
     - traci==1.16.0
+    - imageio==2.31.2
+    - pillow==10.0.0
 
 
   
