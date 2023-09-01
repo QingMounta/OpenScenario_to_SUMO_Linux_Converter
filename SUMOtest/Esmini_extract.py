@@ -4,9 +4,17 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 import os
 import logging
+import re
+import imageio
+import shutil
+
+if len(sys.argv) < 3:
+        print("Usage: python TraciFile_copy.py <filename>")
+        sys.exit(1)
 
 
-
+filename = sys.argv[1]
+folderpath = sys.argv[2]
 
 Lib_path = "../bin/esminiLib.dll"
 esmini_lib = ctypes.CDLL(Lib_path)
@@ -50,9 +58,25 @@ class SEScenarioObjectState(ctypes.Structure):
         ("wheelRot", ctypes.c_float),
     ]
 
-# esmini_lib.SE_Init(sys.argv[1].encode('ascii'), 0, 1, 0, 0)
 
-esmini_lib.SE_Init(b"../resources/myresources/OSC-ALKS-scenarios/Scenarios/ALKS_Scenario_4_4_2_CutInUnavoidableCollision.xosc", 1, 1, 0, 0, 2)
+
+file_path = "../"+folderpath+"/"+filename+".xosc"
+# file_path = "../EnvironmentSimulator/Unittest/xosc/test-collision-detection.xosc"
+
+class WindowSize:
+        """
+        Utility class storing information about the size and position of a window
+        """
+
+        x: int = 0
+        y: int = 0
+        width: int = 1280
+        height: int = 960
+
+esmini_lib.SE_SetWindowPosAndSize(WindowSize.x, WindowSize.y, WindowSize.width, WindowSize.height)
+
+esmini_lib.SE_Init(file_path.encode("ASCII"), 0, 0, 0, 0)
+
 
 # Assuming NumberOfObjects has a certain value
 NumberOfObjects = esmini_lib.SE_GetNumberOfObjects()
@@ -115,6 +139,8 @@ obj_state = SEScenarioObjectState()  # object that will be passed and filled in 
 esmini_lib.SE_StepDT.argtypes = [ctypes.c_float]
 DeltaT = 0.025
 Index = 0
+esmini_lib.SE_CollisionDetection(True)
+
 
 while esmini_lib.SE_GetQuitFlag() != 1:
     # Get the number of rows in the DataFrame
@@ -161,29 +187,20 @@ while esmini_lib.SE_GetQuitFlag() != 1:
         df.loc[Index, f'#{obj_num} Relative_Heading_Angle_Drive_Direction [rad]'] = None
         df.loc[Index, f'#{obj_num} World_Pitch_Angle [rad]'] = obj_state.p
         df.loc[Index, f'#{obj_num} Road_Curvature [1/m]'] = None
-        df.loc[Index, f'#{obj_num} collision_ids'] = None
 
-
-
-        # print('Index {}, Timestamp {:.4f},  Entitity_Name [-]  {},  Entitity_ID [-]  {},  Current_Speed [m/s]  {:.6f}, '
-        #     'Wheel_Angle [deg]  {:.6f}, Wheel_Rotation [-] {:.6f}, '
-        #     'bb_x [m] {:.2f}, bb_y [m] {:.2f}, bb_z [m] {:.2f}, '
-        #     'bb_width [m] {:.2f}, bb_length [m] {:.2f}, bb_height [m] {:.2f}, '
-        #     'World_Position_X [m] {:.6f},World_Position_Y [m] {:.6f},World_Position_Z [m] {:.6f}, '
-        #     'Vel_X [m/s] {:.6f}, Vel_Y [m/s] {:.6f}, Vel_Z [m/s] {:.6f}, '
-        #     'roadId {} laneId {} laneOffset {:.2f} '
-        #     's {:.2f} x {:.6f} y {:.6f} heading {:.2f}  '.format(
-        #             Index, obj_state.timestamp, obj_state.objectCategory, obj_state.id, obj_state.speed, 
-        #             obj_state.wheelAngle, obj_state.wheelRot, 
-        #             obj_state.centerOffsetX, obj_state.centerOffsetY, obj_state.centerOffsetZ, 
-        #             obj_state.length, obj_state.width, obj_state.height, 
-        #             obj_state.x, obj_state.y, obj_state.z,
-        #             obj_state.x, obj_state.y, obj_state.z, 
-        #             obj_state.roadId, obj_state.laneId, obj_state.laneOffset,
-        #             obj_state.s, obj_state.x, obj_state.y, obj_state.h))
-    # esmini_lib.SE_Step()
+        if esmini_lib.SE_GetObjectNumberOfCollisions(obj_num-1) > 0:
+            
+            temp_list = []
+            for k in range(esmini_lib.SE_GetObjectNumberOfCollisions(obj_num-1)):
+                temp_list.append(esmini_lib.SE_GetObjectCollision(obj_num-1, k)+1)
+                df.loc[Index, f'#{obj_num} collision_ids'] = temp_list
+            print("collision ids now at vehicle: ",obj_num," include ",temp_list)
+        else:
+            df.loc[Index, f'#{obj_num} collision_ids'] = None
+ 
     esmini_lib.SE_StepDT(DeltaT)
     Index += 1
+esmini_lib.SE_Close()
 
 for obj_num in range(1,esmini_lib.SE_GetNumberOfObjects()+1):
     df.loc[Index-1, f'#{obj_num} Vel_X [m/s]'] = 0
@@ -210,28 +227,65 @@ for obj_num in range(1,esmini_lib.SE_GetNumberOfObjects()+1):
 # ==============================
 
 # Load the OpenSCENARIO file
-file_path = "../resources/myresources/OSC-ALKS-scenarios/Scenarios/ALKS_Scenario_4_4_2_CutInUnavoidableCollision.xosc"
-# file_path = "../resources/myresources/SampleScenarios/575d7e80-10e8-4f39-84b3-ddb52fbf6089.xosc"
-# file_path = "../resources/myresources/Circle/circle.xosc"
+
 tree = ET.parse(file_path)
 root = tree.getroot()
 
 
 Entities = tree.find("Entities")
-print(list(Entities))
 obj_num = 1
 for object in Entities:
     Entities_name = object.attrib.get('name')
-    print(Entities_name)
     df.loc[:, f'#{obj_num} Entitity_Name [-]'] = Entities_name
     obj_num += 1
 
 
 
 # Write DataFrame to Excel file
-excel_file_name = 'loggingTrajectories.xlsx'
+excel_file_name = "outputfolder_"+filename+"/loggingTrajectoriesXOSC.xlsx"
 df.to_excel(excel_file_name, index=False)
 
 # Log the action
 with open('log.txt', 'a') as log_file:
     log_file.write(f"DataFrame written to {excel_file_name}\n")    
+
+
+
+# ==============================
+# Get the gif generated while simulation
+# ==============================
+
+image_regex = re.compile(r"screen_shot_\d{5,}\.tga")
+
+ignored_images = set(
+    [p for p in os.listdir(".") if image_regex.match(p) is not None]
+)
+
+for ignored_image in ignored_images:
+    os.remove(ignored_image)
+
+esmini_lib.SE_Init(file_path.encode("ASCII"), 0, 7, 0, 0)
+esmini_lib.SE_StepDT.argtypes = [ctypes.c_float]
+while esmini_lib.SE_GetQuitFlag() != 1:
+    esmini_lib.SE_StepDT(DeltaT)
+esmini_lib.SE_Close()
+images = sorted(
+    [
+        p
+        for p in os.listdir(".")
+        if image_regex.match(p) is not None
+    ]
+)
+
+print("Generating animation of this sceanrio...")
+gif_file_path = "outputfolder_"+filename+"/simulation_animation.gif"
+with imageio.get_writer(gif_file_path, mode="I", duration=DeltaT*1000) as writer:
+    for image in images:
+        writer.append_data(imageio.v3.imread(image))
+        os.remove(image)
+print("Animation generated in folder ","outputfolder_"+filename)
+# Log the action
+with open('log.txt', 'a') as log_file:
+    log_file.write(f"Animation generated in {gif_file_path}\n")    
+
+# shutil.move('log.txt', "outputfolder_"+filename+"/log.txt")

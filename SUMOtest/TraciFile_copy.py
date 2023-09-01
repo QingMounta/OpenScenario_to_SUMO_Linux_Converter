@@ -269,14 +269,11 @@ def getNearestPos(ID,Vehicle_Num,logging4sumo,vehicle_pos,threshold):
         return float('inf')
     
 def OpenscenarioInfoConvert(filename):
-    # Reorganize full_log.csv
-    trajectories = pd.read_csv("outputfolder_"+filename+"/full_log.csv",sep=",",header=6)
-    Vehicle_Num=int((trajectories.shape[1] - 3) / 31)
 
-    excel_file_path = "outputfolder_"+filename+"/organized_full_log.xlsx"
-
-    # Write the DataFrame to Excel
-    trajectories.to_excel(excel_file_path, index=False)
+    # Read trajectoryies info from "outputfolder_"+filename+"/loggingTrajectoriesXOSC.xlsx"
+    trajectories = pd.read_excel("outputfolder_"+filename+"/loggingTrajectoriesXOSC.xlsx")
+    Vehicle_Num=int((trajectories.shape[1] - 2) / 31)
+    print(Vehicle_Num)
     
 
     ## sampling time
@@ -351,16 +348,16 @@ def OpenscenarioInfoConvert(filename):
         # if True:
             for iter in range(1,Vehicle_Num+1):
                 Vehicle_ID =  "vehicle" + str(iter) 
-                vehicle_length  = trajectories.loc[0][' #' + str(iter) + ' bb_length [m] ']
-                bounding_box_center = [trajectories.loc[0][' #' + str(iter) + ' bb_x [m] '],trajectories.loc[0][' #' + str(iter) + ' bb_y [m] ']]
+                vehicle_length  = trajectories.loc[0]['#' + str(iter) + ' bb_length [m]']
+                bounding_box_center = [trajectories.loc[0]['#' + str(iter) + ' bb_x [m]'],trajectories.loc[0]['#' + str(iter) + ' bb_y [m]']]
                 
                 vehicles[Vehicle_ID] = Vehicle(Vehicle_ID, vehicle_length,bounding_box_center)
 
                 print("bb_center reference 2 front mid of ",Vehicle_ID,": ", vehicles[Vehicle_ID].bb_center_ref2frontmid)
                 
 
-                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+                x_mid = trajectories.loc[0]['#' + str(iter) + ' World_Position_X [m]']+offset_x
+                y_mid = trajectories.loc[0]['#' + str(iter) + ' World_Position_Y [m]']+offset_y
 
 
                 # print("\n")
@@ -392,8 +389,8 @@ def OpenscenarioInfoConvert(filename):
 
                 angle_init_degree = traci.vehicle.getAngle(Vehicle_ID)
                 print("angle: ",angle_init_degree)
-                x_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-                y_mid = trajectories.loc[0][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
+                x_mid = trajectories.loc[0]['#' + str(iter) + ' World_Position_X [m]']+offset_x
+                y_mid = trajectories.loc[0]['#' + str(iter) + ' World_Position_Y [m]']+offset_y
 
                 vehicles[Vehicle_ID].x_front = x_mid+math.sin(np.deg2rad(angle_init_degree))*vehicles[Vehicle_ID].bb_center_ref2frontmid[0]
                 vehicles[Vehicle_ID].y_front = y_mid+math.cos(np.deg2rad(angle_init_degree))*vehicles[Vehicle_ID].bb_center_ref2frontmid[0]
@@ -404,9 +401,9 @@ def OpenscenarioInfoConvert(filename):
                 # Record the time vehicles need to reach their front
                 # vehicles[Vehicle_ID].t_front = time_reachFront(trajectories.loc[:][' #' + str(iter) + ' World_Position_X [m] '],trajectories.loc[:][' #' + str(iter) + ' World_Position_Y [m] '],vehicles[Vehicle_ID].bb_center_ref2frontmid[0])
                 # print("the steps needed to move from middle to front is ",vehicles[Vehicle_ID].t_front)
-                logging4sumo_data.append({"timestamp":trajectories.loc[0][' TimeStamp [s] '],
-                                          "EntityName":trajectories.loc[0][' #' + str(iter) + ' Entitity_Name [-] '],
-                                          "EntityID":trajectories.loc[0][' #' + str(iter) + ' Entitity_ID [-] '],
+                logging4sumo_data.append({"timestamp":trajectories.loc[0]['TimeStamp [s]'],
+                                          "EntityName":trajectories.loc[0]['#' + str(iter) + ' Entitity_Name [-]'],
+                                          "EntityID":trajectories.loc[0]['#' + str(iter) + ' Entitity_ID [-]'],
                                           "World_Position_X[m]":vehicles[Vehicle_ID].x_front,
                                           "World_Position_Y[m]":vehicles[Vehicle_ID].y_front,
                                           "World_Rotation_Z[m]":angle_init_degree})
@@ -432,10 +429,10 @@ def OpenscenarioInfoConvert(filename):
                 
 
 
-                x_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_X [m] ']+offset_x
-                y_mid = trajectories.loc[step][' #' + str(iter) + ' World_Position_Y [m] ']+offset_y
-                x_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_X [m/s] ']
-                y_vel = trajectories.loc[step][' #' + str(iter) + ' Vel_Y [m/s] ']
+                x_mid = trajectories.loc[step]['#' + str(iter) + ' World_Position_X [m]']+offset_x
+                y_mid = trajectories.loc[step]['#' + str(iter) + ' World_Position_Y [m]']+offset_y
+                x_vel = trajectories.loc[step]['#' + str(iter) + ' Vel_X [m/s]']
+                y_vel = trajectories.loc[step]['#' + str(iter) + ' Vel_Y [m/s]']
 
                 angle_vehicle_radian = math.atan2(x_vel, y_vel)
                 angle_vehicle_degrees = math.degrees(angle_vehicle_radian)
@@ -447,9 +444,9 @@ def OpenscenarioInfoConvert(filename):
                 
                 traci.vehicle.moveToXY(Vehicle_ID,"", 1 ,vehicles[Vehicle_ID].x_front,vehicles[Vehicle_ID].y_front,angle_vehicle_degrees,2)
 
-                logging4sumo_data.append({"timestamp":trajectories.loc[step][' TimeStamp [s] '],
-                                          "EntityName":trajectories.loc[step][' #' + str(iter) + ' Entitity_Name [-] '],
-                                          "EntityID":trajectories.loc[step][' #' + str(iter) + ' Entitity_ID [-] '],
+                logging4sumo_data.append({"timestamp":trajectories.loc[step]['TimeStamp [s]'],
+                                          "EntityName":trajectories.loc[step]['#' + str(iter) + ' Entitity_Name [-]'],
+                                          "EntityID":trajectories.loc[step]['#' + str(iter) + ' Entitity_ID [-]'],
                                           "World_Position_X[m]":vehicles[Vehicle_ID].x_front,
                                           "World_Position_Y[m]":vehicles[Vehicle_ID].y_front,
                                           "World_Rotation_Z[m]":angle_vehicle_degrees})
@@ -661,7 +658,7 @@ if __name__ == '__main__':
 
 
     if len(sys.argv) < 2:
-        print("Usage: python your_script.py <filename>")
+        print("Usage: python TraciFile_copy.py <filename>")
         sys.exit(1)
 
 

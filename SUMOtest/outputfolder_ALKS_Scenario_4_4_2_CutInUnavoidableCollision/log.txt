@@ -1,0 +1,76 @@
+esmini GIT REV: N/A
+esmini GIT TAG: N/A
+esmini GIT BRANCH: N/A
+esmini BUILD VERSION: N/A - client build
+Generated seed 4231011452
+Loading ../resources\myresources\OSC-ALKS-scenarios\Scenarios/./ALKS_Scenario_4_4_2_CutInUnavoidableCollision.xosc (v1.1)
+0 variables
+Loaded OpenDRIVE: ../resources\myresources\OSC-ALKS-scenarios\Scenarios/././ALKS_Road_straight.xodr
+Missing esminiController property, using controller name: ALKSController
+Expr ${$Ego_InitSpeed_Ve0_kph / 3.6} = 60.0 / 3.6 = 16.6666666667
+Expr ${$CutInVehicle_HeadwayDistanceTrigger_dx0_m + (-10.0 * ($CutInVehicle_RelativeInitSpeed_Ve0_Vo0_kph / 3.6))} = 10.0 + (-10.0 * (-20.0 / 3.6)) = 65.5555555556
+Expr ${$CutInVehicle_RelativeInitSpeed_Ve0_Vo0_kph / 3.6} = -20.0 / 3.6 = -5.5555555556
+Expr ${$CutInVehicle_Acceleration_Target_kph / 3.6} = 40.0 / 3.6 = 11.1111111111
+8 parameters:
+   CutInVehicle_Acceleration_Target_kph = 40.0
+   CutInVehicle_Acceleration_Rate_mps2 = 0.0
+   CutInVehicle_LaneChange_MaxLateralVelocity_Vy_mps = 3.0
+   CutInVehicle_HeadwayDistanceTrigger_dx0_m = 10.0
+   CutInVehicle_RelativeInitSpeed_Ve0_Vo0_kph = -20.0
+   CutInVehicle_InitPosition_RelativeLaneId = -1
+   CutInVehicle_Model = car
+   Ego_InitSpeed_Ve0_kph = 60.0
+0.000: No scenegraph 3D model loaded. Generating a simplistic one...
+0.000: Activate continuous screen capture
+0.000: Starting teleport Action
+0.000: Ego New position:
+0.000: Pos(5.00, -8.00, 0.00) Rot(0.00, 0.00, 0.00) roadId 0 laneId -4 offset 0.00 t -8.00
+0.000: Init Ego TeleportAction standbyState -> startTransition -> runningState
+0.000: Init Ego LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Starting teleport Action
+0.000: CutInVehicle New position:
+0.000: Pos(70.56, -11.50, 0.00) Rot(0.00, 0.00, 0.00) roadId 0 laneId -5 offset 0.00 t -11.50
+0.000: Init CutInVehicle TeleportAction standbyState -> startTransition -> runningState
+0.000: Init CutInVehicle LongitudinalAction standbyState -> startTransition -> runningState
+0.000: Init Ego TeleportAction runningState -> endTransition -> completeState
+0.000: Init Ego LongitudinalAction runningState -> endTransition -> completeState
+0.000: Init CutInVehicle TeleportAction runningState -> endTransition -> completeState
+0.000: Init CutInVehicle LongitudinalAction runningState -> endTransition -> completeState
+0.000: Trigger /------------------------------------------------
+0.000: ActivateALKSControllerActCondition == true, 0.0000 >= 0.00 edge: none
+0.000: Trigger  ------------------------------------------------/
+0.000: ActivateALKSControllerManeuver standbyState -> startTransition -> runningState
+0.000: ActivateALKSControllerManeuverGroup standbyState -> startTransition -> runningState
+0.000: ActivateALKSControllerAct standbyState -> startTransition -> runningState
+0.000: Trigger /------------------------------------------------
+0.000: CutInActStart == true, 0.0000 >= 0.00 edge: none
+0.000: Trigger  ------------------------------------------------/
+0.000: CutInManeuver standbyState -> startTransition -> runningState
+0.000: CutInManeuverGroup standbyState -> startTransition -> runningState
+0.000: CutInAct standbyState -> startTransition -> runningState
+3.000: Trigger /------------------------------------------------
+3.000: ActivateALKSControllerEventCondition == true, 3.0000 >= 3.00 edge: none
+3.000: Trigger  ------------------------------------------------/
+3.000: Controller ALKSController activated, domain mask=0x3
+3.025: ActivateALKSControllerAction standbyState -> startTransition -> runningState
+3.025: ActivateALKSControllerEvent standbyState -> startTransition -> runningState
+9.100: Trigger /------------------------------------------------
+9.100: CutInStartCondition == true, rel_dist: 10.00 < 10.00, edge: rising
+9.100: Triggering entity 0: Ego
+9.100: Trigger  ------------------------------------------------/
+9.125: CutInAction standbyState -> startTransition -> runningState
+9.125: CutInAccelerateAction standbyState -> endTransition -> completeState
+9.125: CutInEvent standbyState -> startTransition -> runningState
+10.950: CutInEvent complete after 1 execution
+10.975: CutInAction runningState -> endTransition -> completeState
+10.975: CutInEvent runningState -> endTransition -> completeState
+10.975: CutInManeuverGroup complete after 1 execution
+11.000: End timer 10.00s started
+11.000: CutInManeuver runningState -> endTransition -> completeState
+11.000: CutInManeuverGroup runningState -> endTransition -> completeState
+21.000: End timer expired at 10.00 seconds
+21.000: Trigger /------------------------------------------------
+21.000: End == true, element: CutInAction state: COMPLETE, edge: rising
+21.000: Trigger  ------------------------------------------------/
+Closing
+Animation generated in outputfolder_ALKS_Scenario_4_4_2_CutInUnavoidableCollision/simulation_animation.gif

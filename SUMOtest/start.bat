@@ -18,7 +18,7 @@ set "currentFolder=%CD%"
 @REM cd "%currentFolder%"
 
 REM Prompt the user to enter the opendrive file path (e.g., resources\myresources\Circle)
-set /p filepath=Enter the opendrive file path (e.g., resources\myresources\Circle): 
+set /p forderpath=Enter the opendrive file path (e.g., resources\myresources\Circle): 
 
 REM Prompt the user to enter the xosc filename (e.g., circle)
 set /p filename=Enter the xosc filename (e.g., circle). Please name your xodr file only with letters, numbers and underscore.: 
@@ -29,15 +29,15 @@ set /p odrfilename=Enter the xodr filename (e.g., circle). Please name your xodr
 REM Run esmini command
 @REM ..\bin\esmini --window 60 60 800 400 --osc ..\%filepath%\%filename%.xosc --fixed_timestep 0.025 --record sim.dat
 @REM ..\bin\dat2csv sim.dat
-cd ..
-.\bin\esmini --osc .\%filepath%\%filename%.xosc --fixed_timestep 0.025 --csv_logger full_log.csv --collision
-cd .\SUMOtest\
+@REM cd ..
+@REM .\bin\esmini --osc .\%forderpath%\%filename%.xosc --fixed_timestep 0.025 --csv_logger full_log.csv --collision
+@REM cd .\SUMOtest\
 
 REM Create the output folder using the user-defined filename
 mkdir "outputfolder_%filename%"
 
 REM Run the netconvert command with the modified file path and filename
-netconvert --opendrive "..\%filepath%\%odrfilename%.xodr" -o "outputfolder_%filename%\OpenSCENARIO_output.net.xml"
+netconvert --opendrive "..\%forderpath%\%odrfilename%.xodr" -o "outputfolder_%filename%\OpenSCENARIO_output.net.xml"
 
 REM Check if the netconvert command was successful
 if !errorlevel! equ 0 (
@@ -69,6 +69,7 @@ if !errorlevel! equ 0 (
     cd .\SUMOtest\
     move "infos4unity.txt" "outputfolder_%filename%\"
     @REM move "sim.csv" "outputfolder_%filename%\"
+    python Esmini_extract.py "%filename%" "%forderpath%"
     python TraciFile_copy.py "%filename%"
 ) else (
     REM Display an error message
