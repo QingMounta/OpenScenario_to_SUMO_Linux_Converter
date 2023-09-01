@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generated on 2023-07-28 16:17:23.170310 by randomTrips.py v1_13_0+0000-4b5bca80615
+<configuration>
+    <allow-fringe value="True"/>
+    <end value="1"/>
+    <net-file value="outputfolder_ALKS_Scenario_4.2_4_MultipleBlockingTargets_TEMPLATE\ALKS_Scenario_4.2_4_MultipleBlockingTargets_TEMPLATE.net.xml"/>
+</configuration>
+
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <trip id="0" depart="0.00" from="0" to="-0"/>
+</routes>

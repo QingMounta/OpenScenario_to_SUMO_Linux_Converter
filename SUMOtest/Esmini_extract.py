@@ -112,8 +112,8 @@ for obj_num in range(1, NumberOfObjects + 1):
         f'#{obj_num} lane_offset [m]',
         f'#{obj_num} World_Heading_Angle [rad]',
         f'#{obj_num} Heading_Angle_Rate [rad/s]',
-        f'#{obj_num} Relative_Heading_Angle [rad]',
-        f'#{obj_num} Relative_Heading_Angle_Drive_Direction [rad]',
+        f'#{obj_num} Object Category',
+        f'#{obj_num} Object Type',
         f'#{obj_num} World_Pitch_Angle [rad]',
         f'#{obj_num} Road_Curvature [1/m]',
         f'#{obj_num} collision_ids'
@@ -148,7 +148,8 @@ while esmini_lib.SE_GetQuitFlag() != 1:
     df.loc[Index, 'Index [-]'] = Index
     df.loc[Index, 'TimeStamp [s]'] = Index * DeltaT
     for obj_num in range(1,esmini_lib.SE_GetNumberOfObjects()+1):
-        esmini_lib.SE_GetObjectState(esmini_lib.SE_GetId(obj_num-1), ctypes.byref(obj_state))
+        object_id = esmini_lib.SE_GetId(obj_num-1)
+        esmini_lib.SE_GetObjectState(object_id, ctypes.byref(obj_state))
         
         df.loc[Index, f'#{obj_num} Entitity_ID [-]'] = obj_state.id
         df.loc[Index, f'#{obj_num} Current_Speed [m/s]'] = obj_state.speed
@@ -182,8 +183,18 @@ while esmini_lib.SE_GetQuitFlag() != 1:
         df.loc[Index, f'#{obj_num} lane_offset [m]'] = obj_state.laneOffset
         df.loc[Index, f'#{obj_num} World_Heading_Angle [rad]'] = obj_state.h
         
-        df.loc[Index, f'#{obj_num} Relative_Heading_Angle [rad]'] = None
-        df.loc[Index, f'#{obj_num} Relative_Heading_Angle_Drive_Direction [rad]'] = None
+        # temp_list_type_cate = []
+        # temp_list_type_cate.append(obj_state.objectType)
+        # temp_list_type_cate.append(obj_state.objectCategory)
+        df.loc[Index, f'#{obj_num} Object Category'] = obj_state.objectCategory
+
+
+        # print(object_id)
+        # print(esmini_lib.SE_GetObjectName(object_id))
+        # raw_name: bytes = esmini_lib.SE_GetObjectName(c_object_id)
+        # obj_name =  f"no-name-{object_id}" if raw_name is None else raw_name.decode("utf-8")
+
+        df.loc[Index, f'#{obj_num} Object Type'] = obj_state.objectType
         df.loc[Index, f'#{obj_num} World_Pitch_Angle [rad]'] = obj_state.p
         df.loc[Index, f'#{obj_num} Road_Curvature [1/m]'] = None
 
