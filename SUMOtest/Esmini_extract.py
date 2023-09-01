@@ -8,21 +8,20 @@ import re
 import imageio
 import shutil
 
+import Esmini_get
+
 if len(sys.argv) < 3:
-        print("Usage: python TraciFile_copy.py <filename>")
+        print("Usage: python Esmini_extract.py <filename> <folderpath>")
         sys.exit(1)
 
 
 filename = sys.argv[1]
 folderpath = sys.argv[2]
 
-Lib_path = "../bin/esminiLib.dll"
+Bin_Path = Esmini_get.download_Esmini_getBinPath()
+Lib_path = Bin_Path+"/esminiLib.dll"
 esmini_lib = ctypes.CDLL(Lib_path)
 print(esmini_lib)
-
-# if (len(sys.argv) < 2):
-#     print('Usage: {} <xosc file>'.format(sys.argv[0]))
-#     exit(-1)
 
 
 
