@@ -56,23 +56,23 @@ cd SUMOtest
    
 5. The generating results including the static map, settings of each participants, and the detailed trajectories of each participants are stored in the folder ./SUMOtest/outputfolder_xxx, xxx is the file name of .xosc file:  
 
-  1. `OpenSCENARIO_output.net.xml`: This file contains the static network data converted from the provided Opendrive file.
+  - `OpenSCENARIO_output.net.xml`: This file contains the static network data converted from the provided Opendrive file.
 
-  2. `OpenSCENARIO_output.rou.xml`: This file includes all the object definitions that appear in the given scenario.
+  - `OpenSCENARIO_output.rou.xml`: This file includes all the object definitions that appear in the given scenario.
   
-  3. `infos4unity.txt`: This file provides offset information for use with Unity.
+  - `infos4unity.txt`: This file provides offset information for use with Unity.
   
-  4. `loggingData4SUMO.xlsx`: This file contains detailed trajectories for each object in the scenario in SUMO format.
+  - `loggingData4SUMO.xlsx`: This file contains detailed trajectories for each object in the scenario in SUMO format.
   
-  5. `loggingTrajectoriesXOSC.xlsx`: This file contains detailed trajectories for each object in the scenario in OpenSCENARIO format.
+  - `loggingTrajectoriesXOSC.xlsx`: This file contains detailed trajectories for each object in the scenario in OpenSCENARIO format.
   
-  6. `trips.trips.xml`: This file represents a random trip generated based on the static network (OpenSCENARIO_output.net.xml).
+  - `trips.trips.xml`: This file represents a random trip generated based on the static network (OpenSCENARIO_output.net.xml).
   
-  7. `result.rou.xml`: Corresponding route file to the trip file (`trips.trips.xml`).
+  - `result.rou.xml`: Corresponding route file to the trip file (`trips.trips.xml`).
   
-  8. `simulation.sumocfg`: SUMO configuration file.
+  - `simulation.sumocfg`: SUMO configuration file.
   
-  9. `simulation_animation.gif`: Visualization of the given OpenSCENARIO file via Esmini.
+  - `simulation_animation.gif`: Visualization of the given OpenSCENARIO file via Esmini.
 
 
 
