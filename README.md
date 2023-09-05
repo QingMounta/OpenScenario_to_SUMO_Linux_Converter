@@ -53,8 +53,10 @@ cd SUMOtest
 3. Follow the instructions in the terminal window.
    
 4. The converted sumo simulation file is automatic opened, click "run" to start the simulation
+
+5. If use unity for visualization or/and interaction, "run" unity after start the SUMO simulation
    
-5. The generating results including the static map, settings of each participants, and the detailed trajectories of each participants are stored in the folder ./SUMOtest/outputfolder_xxx, xxx is the file name of .xosc file:  
+6. The generating results including the static map, settings of each participants, and the detailed trajectories of each participants are stored in the folder ./SUMOtest/outputfolder_xxx, xxx is the file name of .xosc file:  
 
   - `OpenSCENARIO_output.net.xml`: This file contains the static network data converted from the provided Opendrive file.
 
