@@ -1,4 +1,4 @@
-# OpenScenario2SUMO_viaEsmini
+# OpenScenario2SUMO
 Automatic traffic scenario conversion interface between OpenSCENARIO and the traffic simulator SUMO
 
 
@@ -99,9 +99,7 @@ cd SUMOtest
 [(Back to top)](#table-of-contents)
 
 
-
-
-[Esmini](https://github.com/esmini/esmini.git)
-[Detailed User guide](https://esmini.github.io)
+If you use OpenScenario2SUMO for academic work, we highly encourage you to cite this repository.\
+Please feel free to reach out to TUM Verkehrstechnik or the directly to the email tian.zheng@tum.de for any questions.
 
 
