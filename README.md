@@ -1,4 +1,5 @@
-# OpenScenario2SUMO
+# OpenScenario2SUMO_Converter
+
 Automatic traffic scenario conversion interface between OpenSCENARIO and the traffic simulator SUMO
 
 
