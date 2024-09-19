@@ -2,26 +2,14 @@
 
 Automatic traffic scenario conversion interface between OpenSCENARIO and the traffic simulator SUMO
 
-
-# Table of contents
-
-- [Prerequisites](#prerequisites)
-- [Installation of Esmini](#installation-of-esmini)
-- [Build Esmini](#build-esmini)
-- [Main Usage](#main-usage)
-- [Unity Connection](#unity-connection)
-- [License](#license)
-- [Converge to csv](#converge-to-csv)
-
-
 # Prerequisites
 [(Back to top)](#table-of-contents)
 
 Before you start, make sure you have the following prerequisites ready.
 
-- **Operating System:** Windows
+- **Operating System:** Ubuntu18.04
 - **Python Version:** The project requires Python. It has been tested on versions '3.10' and '3.11'. Make sure you have Python installed.
-- **SUMO Version:** The project utilizes SUMO version 1.18.0. Follow the [official SUMO installation guide](https://sumo.dlr.de/docs/Installing/index.html) to install it.
+- **SUMO Version:** The project utilizes SUMO version 1.18.0. Follow the[ [official SUMO installation guide](https://sumo.dlr.de/docs/Installing/index.html)](https://github.com/eclipse-sumo/sumo) to install it.
 - **Required Python Packages:** Make sure to have the following Python packages installed: requirements.txt
 
 
@@ -29,12 +17,11 @@ Before you start, make sure you have the following prerequisites ready.
 For the best experience, we strongly recommend using the Anaconda Python distribution.
 
 # Installation
-[(Back to top)](#table-of-contents)
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/TianZheng095/OpenScenario2SUMO_Converter.git
+   git clone https://github.com/QingMounta/OpenScenario_to_SUMO_Linux_Converter.git
    ```
 
 
